@@ -115,3 +115,4 @@ dmypy.json
 
 # User-specific stuff
 .idea/
+.vscode/
