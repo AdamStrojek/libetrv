@@ -1,4 +1,7 @@
 # eTRV2MQTT
+
+**Application is currently under development and it is not design to be used by end user**
+
 Monitor and control your eTRV over MQTT. Recently Danfoss has released new TRVs that can be controlled
 over BLE. This service will allow connect this devices directly to any Smart Home software that supports MQTT.
 
