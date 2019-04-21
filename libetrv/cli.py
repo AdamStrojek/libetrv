@@ -21,7 +21,20 @@ class CLI:
         )
         time.sleep(5)
         print("Secret Key:", eTRVDevice(device, pin=self._pin).retrieve_secret_key().hex())
+    
+    def device(self, device_id):
+        return Device(device_id, self._pin, self._secret)
 
+
+class Device:
+    def __init__(self, device, pin, secret):
+        self._pin = pin
+        self._secret = secret
+        self._device = eTRVDevice(device, pin=self._pin, secret=self._secret)
+    
+    def battery(self):
+        battery = self._device.battery
+        print("Battery level: {}%".format(battery))
 
 class Temperature:
     """
