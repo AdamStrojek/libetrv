@@ -21,7 +21,17 @@ class eTRVDevice(object):
         self.address = address
         self.secret = secret
         self.pin = b'0000' if pin is None else pin
-        self.ble_device = None  # type: btle.Peripheral
+        self.ble_device = None 
+    
+    @staticmethod
+    def scan(timeout=10.0):
+        devices = btle.Scanner().scan(timeout)
+
+        for dev in devices:
+            scan_data = dev.getScanData()
+            for (adtype, desc, value) in scan_data:
+                if adtype == 9 and value.endswith(';eTRV'):
+                    yield dev
 
     def is_connected(self):
         return self.ble_device is not None
