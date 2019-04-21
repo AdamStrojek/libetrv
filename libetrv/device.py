@@ -73,17 +73,16 @@ class eTRVDevice(object):
         res = self.ble_device.writeCharacteristic(service, data, True)  # type: bytes
         return res[::-1]
 
-    def __read(self, service: int):
+    def __read(self, service: int, send_pin: bool = True, decrypt: bool = True):
         if not self.is_connected():
-            self.connect()
+            self.connect(send_pin)
 
         res = self.ble_device.readCharacteristic(service)  # type: bytes
-        # res = res[::-1]
-        xxtea.decrypt(res, self.secret, padding=False,rounds=32)
-        return res
+        if decrypt:
+            res = res[::-1]  # Change big endian to little endian
+            res = xxtea.decrypt(res, self.secret, padding=False,rounds=32)
 
-    def get_encryption_key(self):
-        pass
+        return res
 
     @property
     def pin(self):
@@ -93,6 +92,9 @@ class eTRVDevice(object):
     @pin.setter
     def pin(self, value):
         self._pin = value
+
+    def retrieve_secret_key(self):
+        return self.__read(eTRVDevice.SECRET_R, False, False)
 
     @property
     def secret(self):
