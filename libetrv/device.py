@@ -118,5 +118,5 @@ class eTRVDevice(object):
         if not self.is_connected():
             self.connect()
 
-        res = self.ble_device.readCharacteristic(eTRVDevice.BATTERY_LEVEL_R)
-        return res[0]
+        res = self.__read(eTRVDevice.BATTERY_LEVEL_R, True, False)
+        return int(res[0])
