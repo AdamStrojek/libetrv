@@ -49,7 +49,8 @@ class eTRVDevice(object):
         while True:
             try:
                 self.ble_device = btle.Peripheral(self.address)
-                self.__send_pin()
+                if send_pin:
+                    self.__send_pin()
                 break
             except btle.BTLEDisconnectError:
                 logger.error("Unable connect to {}. Retrying in 100ms", self.address)
