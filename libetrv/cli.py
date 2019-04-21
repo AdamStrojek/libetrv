@@ -1,3 +1,4 @@
+import time
 import fire
 from libetrv.device import eTRVDevice
 
@@ -12,8 +13,15 @@ class CLI:
         for device in eTRVDevice.scan(timeout):
             print("{}, RSSI={}dB".format(device.addr, device.rssi))
 
-    def retrive_key(self, *devices):
-        pass
+    def retrive_key(self, device):
+        print(
+            "In 5 seconds this script will try to retrieve a secure key from eTRV device. "
+            "Don't forget to save it for later. Before that be sure that device is in pairing mode. "
+            "You can achieve that by pressing button on device"
+        )
+        time.sleep(5)
+        print("Secret Key:", eTRVDevice(device, pin=self._pin).retrieve_secret_key().hex())
+
 
 class Temperature:
     """
