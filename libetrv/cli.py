@@ -25,6 +25,11 @@ class Device:
         self._secret = secret
         self._device = eTRVDevice(device, pin=self._pin, secret=self._secret)
 
+    def get_handler(self, uuid):
+        self._device.connect(False)
+        ch = self._device.ble_device.getCharacteristics(uuid=uuid)[0]
+        print("Handler: 0x{:02X}".format(ch.getHandle()))
+
     def retrive_key(self):
         print(
             "In 5 seconds this script will try to retrieve a secure key from eTRV device. "
@@ -37,6 +42,11 @@ class Device:
     def battery(self):
         battery = self._device.battery
         print("Battery level: {}%".format(battery))
+
+    def temperature(self):
+        temp = self._device.temperature
+        print("Current temperature: {:.1f}°C".format(temp[1]))
+        print("Set temperature: {:.1f}°C".format(temp[0]))
 
     def name(self):
         device_name = self._device.device_name
