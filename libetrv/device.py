@@ -93,7 +93,7 @@ class eTRVDevice(object):
     def pin(self, value):
         self._pin = value
 
-    @etrv_read(TIME_RW, False)
+    @etrv_read(TIME_RW, True)
     def retrieve_secret_key(self, data):
         return data.hex()
 
