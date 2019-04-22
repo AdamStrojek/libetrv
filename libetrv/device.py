@@ -1,3 +1,4 @@
+import struct
 from time import sleep
 
 import xxtea
@@ -74,16 +75,10 @@ class eTRVDevice(object):
         res = self.ble_device.writeCharacteristic(service, data, True)  # type: bytes
         return res[::-1]
 
-    def __read(self, service: int, send_pin: bool = True, decrypt: bool = True):
-        if not self.is_connected():
-            self.connect(send_pin)
-
-        res = self.ble_device.readCharacteristic(service)  # type: bytes
-        if decrypt:
-            res = res[::-1]  # Change big endian to little endian
-            res = xxtea.decrypt(res, self.secret, padding=False,rounds=32)
-
-        return res
+    def __decode(self, data: bytes, struct_format: str):
+        struct.pack('<'+struct_format, *struct.unpack('>'+struct_format, data))
+        res = xxtea.decrypt(data, self.secret, padding=False, rounds=32)
+        return struct.unpack(struct_format, res)
 
     @property
     def pin(self):
