@@ -2,18 +2,17 @@ import struct
 from time import sleep
 from datetime import datetime
 
-import xxtea
 from bluepy import btle
 from loguru import logger
 
-from .utils import etrv_read
+from .utils import etrv_read, etrv_repack, etrv_decode, etrv_reverse_chunks
 
 class eTRVDevice(object):
     BATTERY_LEVEL_R = 0x0010
 
     PIN_W = 0x0024
 
-    MANUAL_TEMPERATURE_RW = 0x002d
+    TEMPERATURE_RW = 0x002d
 
     DEVICE_NAME_RW = 0x0030
 
@@ -82,9 +81,8 @@ class eTRVDevice(object):
         return res[::-1]
 
     def __decode(self, data: bytes, struct_format: str = None):
-        if struct_format is not None:
-            struct.pack('<'+struct_format, *struct.unpack('>'+struct_format, data))
-        res = xxtea.decrypt(data, self.secret, padding=False, rounds=32)
+        data = etrv_reverse_chunks(data)
+        res = etrv_decode(data, self.secret)
         if struct_format is not None:
             return struct.unpack(struct_format, res)
         return res
@@ -111,12 +109,13 @@ class eTRVDevice(object):
         self._secret = value
 
     @property
-    def temperature(self):
-        return self.__read(eTRVDevice.MANUAL_TEMPERATURE_RW)
-
-    @temperature.setter
-    def set_temperature(self, value):
-        pass
+    @etrv_read(TEMPERATURE_RW, True)
+    def temperature(self, data):
+        data = etrv_reverse_chunks(data)
+        data = etrv_decode(data, self.secret)
+        data = etrv_reverse_chunks(data)
+        x = struct.unpack('bb', data[:2])
+        return x[0]*.5, x[1]*.5
 
     @property
     @etrv_read(BATTERY_LEVEL_R, True)
