@@ -38,6 +38,10 @@ class Device:
         battery = self._device.battery
         print("Battery level: {}%".format(battery))
 
+    def name(self):
+        device_name = self._device.device_name
+        print("Device name: '{}'".format(device_name))
+
     def time(self):
         time_utc = self._device.time
         print("Current time: {}".format(time.strftime('%Y-%m-%d %H:%M:%S %Z')))
