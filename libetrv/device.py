@@ -15,6 +15,8 @@ class eTRVDevice(object):
 
     MANUAL_TEMPERATURE_RW = 0x002d
 
+    DEVICE_NAME_RW = 0x0030
+
     TIME_RW = 0x0036
 
     SECRET_R = 0x003f
@@ -79,10 +81,13 @@ class eTRVDevice(object):
         res = self.ble_device.writeCharacteristic(service, data, True)  # type: bytes
         return res[::-1]
 
-    def __decode(self, data: bytes, struct_format: str):
-        struct.pack('<'+struct_format, *struct.unpack('>'+struct_format, data))
+    def __decode(self, data: bytes, struct_format: str = None):
+        if struct_format is not None:
+            struct.pack('<'+struct_format, *struct.unpack('>'+struct_format, data))
         res = xxtea.decrypt(data, self.secret, padding=False, rounds=32)
-        return struct.unpack(struct_format, res)
+        if struct_format is not None:
+            return struct.unpack(struct_format, res)
+        return res
 
     @property
     def pin(self):
@@ -118,6 +123,13 @@ class eTRVDevice(object):
     def battery(self, data):
         battery = struct.unpack('b', data)
         return battery[0]
+
+    @property
+    @etrv_read(DEVICE_NAME_RW, True)
+    def device_name(self, data):
+        # This function do not work properly, need to fix later~
+        data = self.__decode(data)
+        return data.decode()
 
     @property
     @etrv_read(TIME_RW, True)
