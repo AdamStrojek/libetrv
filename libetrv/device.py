@@ -1,10 +1,12 @@
 import struct
 from time import sleep
+from datetime import datetime
 
 import xxtea
 from bluepy import btle
 from loguru import logger
 
+from .utils import etrv_read
 
 class eTRVDevice(object):
     BATTERY_LEVEL_R = 0x0010
@@ -12,6 +14,8 @@ class eTRVDevice(object):
     PIN_W = 0x0024
 
     MANUAL_TEMPERATURE_RW = 0x002d
+
+    TIME_RW = 0x0036
 
     SECRET_R = 0x003f
 
@@ -109,9 +113,13 @@ class eTRVDevice(object):
         pass
 
     @property
-    def battery(self):
-        if not self.is_connected():
-            self.connect()
+    @etrv_read(BATTERY_LEVEL_R, True)
+    def battery(self, data):
+        battery = struct.unpack('b', data)
+        return battery[0]
 
-        res = self.__read(eTRVDevice.BATTERY_LEVEL_R, True, False)
-        return int(res[0])
+    @property
+    @etrv_read(TIME_RW, True)
+    def time(self, data):
+        time_local, time_offset = self.__decode(data, 'ii')
+        return datetime.utcfromtimestamp(time_local-time_offset)
