@@ -1,6 +1,4 @@
-import struct
-import cstruct
-import enum
+from collections import namedtuple
 from time import sleep
 from datetime import datetime
 
@@ -11,10 +9,17 @@ from .data_struct import ScheduleMode, SettingsStruct, TemperatureStruct, TimeSt
 from .utils import etrv_read, etrv_write
 
 
+Settings = namedtuple('Settings',
+    ['frost_protection_temperature', 'schedule_mode', 'vacation_temperature', 'vacation_from', 'vacation_to']
+)
+
+
 class eTRVDevice(object):
     BATTERY_LEVEL_R = 0x0010
 
     PIN_W = 0x0024
+
+    SETTINGS_RW = 0x002a
 
     TEMPERATURE_RW = 0x002d
 
@@ -79,6 +84,16 @@ class eTRVDevice(object):
     @etrv_read(TIME_RW, True)
     def retrieve_secret_key(self, data):
         return data.hex()
+
+    @etrv_read(SETTINGS_RW, True, SettingsStruct)
+    def settings(self, data: SettingsStruct):
+        ret = Settings()
+        ret.frost_protection_temperature = data.frost_protection_temperature * .5
+        ret.schedule_mode = data.schedule_mode
+        ret.vacation_temperature = data.vacation_temperature * .5
+        ret.vacation_from = datetime.utcfromtimestamp(data.vacation_from)
+        ret.vacation_to = datetime.utcfromtimestamp(data.vacation_to)
+        return ret
 
     @property
     @etrv_read(TEMPERATURE_RW, True, TemperatureStruct)
