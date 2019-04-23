@@ -120,6 +120,23 @@ class eTRVDevice(object):
         return current_temp, set_temp
 
     @property
+    def current_temperature(self):
+        """
+        This property will return current temperature measured on device with precision up to 0.5 degrees
+        """
+        current_temp, _ = self.temperature
+        return current_temp
+
+    @property
+    def set_point_temperature(self):
+        """
+        This property is responsible for set point temperature. It will allow you to not only retrieve
+        current value, but also set new. Temperature will be always rounded to 0.5 degree
+        """
+        _, set_temp = self.temperature
+        return set_temp
+
+    @property
     @etrv_read(BATTERY_LEVEL_R, True)
     def battery(self, data):
         """
