@@ -5,7 +5,8 @@ from datetime import datetime
 from bluepy import btle
 from loguru import logger
 
-from .data_struct import ScheduleMode, SettingsStruct, TemperatureStruct, TimeStruct, BatteryStruct
+from .data_struct import ScheduleMode, SettingsStruct, TemperatureStruct, TimeStruct, BatteryStruct, ScheduleStruct
+from .schedule import Schedule
 from .utils import etrv_read, etrv_write
 
 
@@ -28,6 +29,8 @@ class eTRVDevice(object):
     TIME_RW = 0x0036
 
     SECRET_R = 0x003f
+
+    SCHEDULE_RW = []  # "1002000D-2749-0001-0000-00805F9B042F", "1002000E-2749-0001-0000-00805F9B042F", "1002000F-2749-0001-0000-00805F9B042F"
 
     def __init__(self, address, secret=None, pin=None):
         """
@@ -148,3 +151,10 @@ class eTRVDevice(object):
     @etrv_read(TIME_RW, True, TimeStruct)
     def time(self, data: TimeStruct):
         return datetime.utcfromtimestamp(data.time_local-data.time_offset)
+
+    @property
+    @etrv_read(SCHEDULE_RW, True, ScheduleStruct)
+    def schedule(self, data: ScheduleStruct) -> Schedule:
+        s = Schedule()
+        s.parse_struct(data)
+        return s
