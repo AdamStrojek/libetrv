@@ -148,23 +148,22 @@ class eTRVDevice(object):
         self._secret = value
 
     @property
-    @etrv_read(TEMPERATURE_RW, True)
-    def temperature(self, data):
+    @etrv_read(TEMPERATURE_RW, True, TemperatureStruct)
+    def temperature(self, data: TemperatureStruct):
         """
         This property will return both current and set point temperature
         """
-        data = etrv_reverse_chunks(data)
-        data = etrv_decode(data, self.secret)
-        current_temp, set_temp = struct.unpack_from('bb', data, 2)
-        return current_temp, set_temp
+        room_temp = data.room_temperature * .5
+        set_temp = data.set_point_temperature * .5
+        return room_temp, set_temp
 
     @property
-    def current_temperature(self):
+    def room_temperature(self):
         """
         This property will return current temperature measured on device with precision up to 0.5 degrees
         """
-        current_temp, _ = self.temperature
-        return current_temp
+        room_temp, _ = self.temperature
+        return room_temp
 
     @property
     def set_point_temperature(self):
@@ -176,25 +175,21 @@ class eTRVDevice(object):
         return set_temp
 
     @property
-    @etrv_read(BATTERY_LEVEL_R, True)
-    def battery(self, data):
+    @etrv_read(BATTERY_LEVEL_R, True, BatteryStruct)
+    def battery(self, data: BatteryStruct):
         """
         This property will return current battery level in integer
         """
-        battery_level, = struct.unpack('b', data)
-        return battery_level
+        return data.battery
 
     @property
     @etrv_read(DEVICE_NAME_RW, True)
-    def device_name(self, data):
+    def device_name(self, data: bytes):
         # TODO This function do not work properly, need to fix later
-        data = etrv_reverse_chunks(data)
-        data = etrv_decode(data, self.secret)
-        data = etrv_reverse_chunks(data).strip(b'\0')
+        data = data.strip(b'\0')
         return data.decode('ascii')
 
     @property
-    @etrv_read(TIME_RW, True)
-    def time(self, data):
-        time_local, time_offset = self.__decode(data, 'ii')
-        return datetime.utcfromtimestamp(time_local-time_offset)
+    @etrv_read(TIME_RW, True, TimeStruct)
+    def time(self, data: TimeStruct):
+        return datetime.utcfromtimestamp(data.time_local-data.time_offset)
