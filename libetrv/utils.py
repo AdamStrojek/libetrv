@@ -1,6 +1,7 @@
 import struct
 from collections import Iterable
 from functools import wraps
+from typing import Union
 
 import xxtea
 
