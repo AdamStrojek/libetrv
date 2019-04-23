@@ -9,7 +9,7 @@ class ScheduleMode(enum.IntEnum):
 
 
 class SettingsStruct(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __byte_order__ = cstruct.BIG_ENDIAN
     __struct__ = """
         unsigned char unknow1[3];
         unsigned char frost_protection_temperature;
@@ -22,16 +22,16 @@ class SettingsStruct(cstruct.CStruct):
 
 
 class TemperatureStruct(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __byte_order__ = cstruct.BIG_ENDIAN
     __struct__ = """
-        unsigned char set_point_temperature;
         unsigned char room_temperature;
+        unsigned char set_point_temperature;
         unsigned char padding[6];
     """
 
 
 class TimeStruct(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __byte_order__ = cstruct.BIG_ENDIAN
     __struct__ = """
         int time_local;
         int time_offset;
@@ -39,21 +39,21 @@ class TimeStruct(cstruct.CStruct):
 
 
 class BatteryStruct(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __byte_order__ = cstruct.BIG_ENDIAN
     __struct__ = """
         unsigned char battery;
     """
 
 
 class DaySchedule(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __byte_order__ = cstruct.BIG_ENDIAN
     __struct__ = """
         unsigned char data[6];
     """
 
 
 class ScheduleStruct(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __byte_order__ = cstruct.BIG_ENDIAN
     __struct__ = """
         unsigned char home_temperature;
         unsigned char away_temperature;
