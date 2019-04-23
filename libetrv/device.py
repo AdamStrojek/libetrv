@@ -80,13 +80,6 @@ class eTRVDevice(object):
         res = self.ble_device.writeCharacteristic(service, data, True)  # type: bytes
         return res[::-1]
 
-    def __decode(self, data: bytes, struct_format: str = None):
-        data = etrv_reverse_chunks(data)
-        res = etrv_decode(data, self.secret)
-        if struct_format is not None:
-            return struct.unpack(struct_format, res)
-        return res
-
     @property
     def pin(self):
         """The pin property."""
