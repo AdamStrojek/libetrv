@@ -111,11 +111,13 @@ class eTRVDevice(object):
     @property
     @etrv_read(TEMPERATURE_RW, True)
     def temperature(self, data):
+        """
+        This property will return both current and set point temperature
+        """
         data = etrv_reverse_chunks(data)
         data = etrv_decode(data, self.secret)
-        data = etrv_reverse_chunks(data)
-        x = struct.unpack('bb', data[:2])
-        return x[0]*.5, x[1]*.5
+        current_temp, set_temp = struct.unpack_from('bb', data, 2)
+        return current_temp, set_temp
 
     @property
     @etrv_read(BATTERY_LEVEL_R, True)
