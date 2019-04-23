@@ -1,24 +1,30 @@
 import struct
+from collections import Iterable
 from functools import wraps
 
 import xxtea
 
 
-def etrv_read(handler: int, send_pin: bool = False, cstruct_cls=None):
+def etrv_read(handler, send_pin: bool = False, cstruct_cls=None):
     def decorator(func):
         @wraps(func)
         def wrapper(etrv):
             if not etrv.is_connected():
                 etrv.connect(send_pin)
-            data = etrv.ble_device.readCharacteristic(handler)
-            data = etrv_decode(data, etrv.secret)
+            complete_data = bytearray()
+            if not isinstance(handler, Iterable):
+                handler = [handler]
+            for h in handler:
+                data = etrv.ble_device.readCharacteristic(h)
+                data = etrv_decode(data, etrv.secret)
+                complete_data.append(data)
             # TODO switch to type hints
             # https://docs.python.org/3.5/library/typing.html#typing.get_type_hints
             if cstruct_cls is not None:
                 cstruct = cstruct_cls()
-                cstruct.unpack(data)
+                cstruct.unpack(complete_data)
                 return func(etrv, cstruct)
-            return func(etrv, data)
+            return func(etrv, complete_data)
         return wrapper
     return decorator
 
