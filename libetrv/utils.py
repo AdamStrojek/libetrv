@@ -4,13 +4,20 @@ from functools import wraps
 import xxtea
 
 
-def etrv_read(handler, send_pin=False):
+def etrv_read(handler, send_pin=False, cstruct_cls=None):
     def decorator(func):
         @wraps(func)
         def wrapper(etrv):
             if not etrv.is_connected():
                 etrv.connect(send_pin)
             data = etrv.ble_device.readCharacteristic(handler)
+            data = etrv_decode(data, etrv.secret)
+            # TODO switch to type hints
+            # https://docs.python.org/3.5/library/typing.html#typing.get_type_hints
+            if cstruct_cls is not None:
+                cstruct = cstruct_cls()
+                cstruct.unpack(data)
+                return func(etrv, cstruct)
             return func(etrv, data)
         return wrapper
     return decorator
