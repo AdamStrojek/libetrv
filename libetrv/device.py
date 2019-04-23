@@ -7,7 +7,7 @@ from datetime import datetime
 from bluepy import btle
 from loguru import logger
 
-from .utils import etrv_read, etrv_repack, etrv_decode, etrv_reverse_chunks
+from .utils import etrv_read, etrv_write
 
 
 class ScheduleMode(enum.IntEnum):
