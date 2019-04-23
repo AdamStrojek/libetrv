@@ -4,7 +4,7 @@ from functools import wraps
 import xxtea
 
 
-def etrv_read(handler, send_pin=False, cstruct_cls=None):
+def etrv_read(handler: int, send_pin: bool = False, cstruct_cls=None):
     def decorator(func):
         @wraps(func)
         def wrapper(etrv):
