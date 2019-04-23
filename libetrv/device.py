@@ -149,6 +149,13 @@ class eTRVDevice(object):
         _, set_temp = self.temperature
         return set_temp
 
+    @set_point_temperature.setter
+    @etrv_write(TEMPERATURE_RW, True)
+    def set_point_temperature(self, value: float) -> TemperatureStruct:
+        temp = TemperatureStruct()
+        temp.set_point_temperature = int(value*2)
+        return temp
+
     @property
     @etrv_read(BATTERY_LEVEL_R, True, BatteryStruct)
     def battery(self, data: BatteryStruct):
