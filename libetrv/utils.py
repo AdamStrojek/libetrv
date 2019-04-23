@@ -21,7 +21,10 @@ def etrv_repack(data: bytes, format: str):
 
 
 def etrv_decode(data: bytes, key: bytes):
-    return xxtea.decrypt(data, key, padding=False, rounds=32)
+    data = etrv_reverse_chunks(data)
+    data = xxtea.decrypt(data, key, padding=False, rounds=32)
+    data = etrv_reverse_chunks(data)
+    return data
 
 
 def etrv_reverse_chunks(data: bytes):
