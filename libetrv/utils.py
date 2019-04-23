@@ -5,19 +5,20 @@ from functools import wraps
 import xxtea
 
 
-def etrv_read(handler, send_pin: bool = False, cstruct_cls=None):
+def etrv_read(handlers: Union[int, Iterable], send_pin: bool = False, cstruct_cls=None):
+    if not isinstance(handlers, Iterable):
+        handlers = [handlers]
     def decorator(func):
         @wraps(func)
         def wrapper(etrv):
             if not etrv.is_connected():
                 etrv.connect(send_pin)
             complete_data = bytearray()
-            if not isinstance(handler, Iterable):
-                handler = [handler]
-            for h in handler:
-                data = etrv.ble_device.readCharacteristic(h)
+
+            for handler in handlers:
+                data = etrv.ble_device.readCharacteristic(handler)
                 data = etrv_decode(data, etrv.secret)
-                complete_data.append(data)
+                complete_data += data
             # TODO switch to type hints
             # https://docs.python.org/3.5/library/typing.html#typing.get_type_hints
             if cstruct_cls is not None:
