@@ -118,26 +118,9 @@ class eTRVDevice(object):
         logger.debug("Write PIN to {}", self.address)
         self.ble_device.writeCharacteristic(eTRVDevice.PIN_W, self.pin, True)
 
-    @property
-    def pin(self):
-        """The pin property."""
-        return self._pin
-
-    @pin.setter
-    def pin(self, value):
-        self._pin = value
-
     @etrv_read(TIME_RW, True)
     def retrieve_secret_key(self, data):
         return data.hex()
-
-    @property
-    def secret(self):
-        """The secret property."""
-        return self._secret
-    @secret.setter
-    def secret(self, value):
-        self._secret = value
 
     @property
     @etrv_read(TEMPERATURE_RW, True, TemperatureStruct)
