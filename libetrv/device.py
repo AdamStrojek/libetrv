@@ -126,8 +126,10 @@ class eTRVDevice(object):
     @property
     @etrv_read(DEVICE_NAME_RW, True)
     def device_name(self, data):
-        # This function do not work properly, need to fix later~
-        data = self.__decode(data)
+        # TODO This function do not work properly, need to fix later
+        data = etrv_reverse_chunks(data)
+        data = etrv_decode(data, self.secret)
+        data = etrv_reverse_chunks(data)
         return data.decode()
 
     @property
