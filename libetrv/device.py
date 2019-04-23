@@ -88,7 +88,7 @@ class eTRVDevice(object):
     def retrieve_secret_key(self, data):
         return data.hex()
 
-    @etrv_read(SETTINGS_RW, True, SettingsStruct)
+    @etrv_read(SETTINGS_RW, True)
     def settings(self, data: SettingsStruct):
         ret = Settings()
         ret.frost_protection_temperature = data.frost_protection_temperature * .5
@@ -99,7 +99,7 @@ class eTRVDevice(object):
         return ret
 
     @property
-    @etrv_read(TEMPERATURE_RW, True, TemperatureStruct)
+    @etrv_read(TEMPERATURE_RW, True)
     def temperature(self, data: TemperatureStruct):
         """
         This property will return both current and set point temperature
@@ -133,7 +133,7 @@ class eTRVDevice(object):
         return temp
 
     @property
-    @etrv_read(BATTERY_LEVEL_R, True, BatteryStruct)
+    @etrv_read(BATTERY_LEVEL_R, True, False)
     def battery(self, data: BatteryStruct):
         """
         This property will return current battery level in integer
@@ -148,12 +148,12 @@ class eTRVDevice(object):
         return data.decode('ascii')
 
     @property
-    @etrv_read(TIME_RW, True, TimeStruct)
+    @etrv_read(TIME_RW, True)
     def time(self, data: TimeStruct):
         return datetime.utcfromtimestamp(data.time_local-data.time_offset)
 
     @property
-    @etrv_read(SCHEDULE_RW, True, ScheduleStruct)
+    @etrv_read(SCHEDULE_RW, True)
     def schedule(self, data: ScheduleStruct) -> Schedule:
         s = Schedule()
         s.parse_struct(data)

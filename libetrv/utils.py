@@ -1,12 +1,12 @@
 import struct
 from collections import Iterable
 from functools import wraps
-from typing import Union
+from typing import Union, get_type_hints
 
 import xxtea
 
 
-def etrv_read(handlers: Union[int, Iterable], send_pin: bool = False, cstruct_cls=None):
+def etrv_read(handlers: Union[int, Iterable], send_pin: bool = False, decode: bool = True):
     if not isinstance(handlers, Iterable):
         handlers = [handlers]
     def decorator(func):
@@ -18,10 +18,11 @@ def etrv_read(handlers: Union[int, Iterable], send_pin: bool = False, cstruct_cl
 
             for handler in handlers:
                 data = etrv.ble_device.readCharacteristic(handler)
-                data = etrv_decode(data, etrv.secret)
+                if decode:
+                    data = etrv_decode(data, etrv.secret)
                 complete_data += data
-            # TODO switch to type hints
-            # https://docs.python.org/3.5/library/typing.html#typing.get_type_hints
+            hints = get_type_hints(func)
+            cstruct_cls = hints['data']
             if cstruct_cls is not None:
                 cstruct = cstruct_cls()
                 cstruct.unpack(complete_data)
