@@ -43,3 +43,19 @@ class BatteryStruct(cstruct.CStruct):
     __struct__ = """
         unsigned char battery;
     """
+
+
+class DaySchedule(cstruct.CStruct):
+    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __struct__ = """
+        unsigned char data[6];
+    """
+
+
+class ScheduleStruct(cstruct.CStruct):
+    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __struct__ = """
+        unsigned char home_temperature;
+        unsigned char away_temperature;
+        struct DaySchedule schedule[7];
+    """
