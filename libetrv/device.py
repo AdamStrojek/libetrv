@@ -120,8 +120,11 @@ class eTRVDevice(object):
     @property
     @etrv_read(BATTERY_LEVEL_R, True)
     def battery(self, data):
-        battery = struct.unpack('b', data)
-        return battery[0]
+        """
+        This property will return current battery level in integer
+        """
+        battery_level, = struct.unpack('b', data)
+        return battery_level
 
     @property
     @etrv_read(DEVICE_NAME_RW, True)
