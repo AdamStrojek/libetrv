@@ -151,8 +151,8 @@ class eTRVDevice(object):
         # TODO This function do not work properly, need to fix later
         data = etrv_reverse_chunks(data)
         data = etrv_decode(data, self.secret)
-        data = etrv_reverse_chunks(data)
-        return data.decode()
+        data = etrv_reverse_chunks(data).strip(b'\0')
+        return data.decode('ascii')
 
     @property
     @etrv_read(TIME_RW, True)
