@@ -81,7 +81,7 @@ class eTRVDevice(object):
         logger.debug("Write PIN to {}", self.address)
         self.ble_device.writeCharacteristic(eTRVDevice.PIN_W, self.pin, True)
 
-    @etrv_read(TIME_RW, True)
+    @etrv_read(SECRET_R, True)
     def retrieve_secret_key(self, data):
         return data.hex()
 
