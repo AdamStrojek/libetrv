@@ -88,7 +88,7 @@ class eTRVDevice(object):
     def is_connected(self):
         return self.ble_device is not None
 
-    def connect(self, send_pin=True):
+    def connect(self, send_pin: bool = True):
         """
         This method allow you to connect to eTRV device and if it is required it will
         also send pin. You can select is it necessery
@@ -102,7 +102,7 @@ class eTRVDevice(object):
             try:
                 self.ble_device = btle.Peripheral(self.address)
                 if send_pin:
-                    self.__send_pin()
+                    self.send_pin()
                 break
             except btle.BTLEDisconnectError:
                 logger.error("Unable connect to {}. Retrying in 100ms", self.address)
@@ -114,17 +114,9 @@ class eTRVDevice(object):
             self.ble_device.disconnect()
             self.ble_device = None
 
-    def __send_pin(self):
+    def send_pin(self):
         logger.debug("Write PIN to {}", self.address)
         self.ble_device.writeCharacteristic(eTRVDevice.PIN_W, self.pin, True)
-
-    def __write(self, service: int, data: bytes):
-        if not self.is_connected():
-            self.connect()
-
-        data = data[::-1]
-        res = self.ble_device.writeCharacteristic(service, data, True)  # type: bytes
-        return res[::-1]
 
     @property
     def pin(self):
