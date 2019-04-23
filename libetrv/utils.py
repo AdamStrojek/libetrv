@@ -23,6 +23,22 @@ def etrv_read(handler, send_pin=False, cstruct_cls=None):
     return decorator
 
 
+def etrv_write(handler: int, send_pin: bool = False):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(etrv, *args):
+            data = func(etrv, *args)
+            if hasattr(data, 'pack'):
+                data = data.pack()
+            data = etrv_encode(data, etrv.secret)
+            if not etrv.is_connected():
+                etrv.connect(send_pin)
+            ret = etrv.ble_device.writeCharacteristic(handler, data, True)
+            return ret
+        return wrapper
+    return decorator
+
+
 def etrv_repack(data: bytes, format: str):
     return struct.pack(format, *struct.unpack('>'+format, data))
 
