@@ -166,7 +166,7 @@ class eTRVDevice(object):
 
     @property
     @etrv_read(DEVICE_NAME_RW, True)
-    def device_name(self, data: bytes):
+    def device_name(self, data: bytes) -> str:
         # TODO This function do not work properly, need to fix later
         data = data.strip(b'\0')
         return data.decode('ascii')
