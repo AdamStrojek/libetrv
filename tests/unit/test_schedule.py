@@ -1,6 +1,7 @@
 import pytest
 
 from libetrv.data_struct import ScheduleStruct
+from libetrv.exceptions import ParsingError
 from libetrv.schedule import Schedule
 
 
@@ -58,7 +59,7 @@ class TestScheduleStruct:
 
 
 class TestScheduleParsing:
-    def test_parsing(self, data_struct):
+    def test_parsing_correct_data(self, data_struct):
         obj = Schedule.from_struct(data_struct)
         assert obj.home_temperature == 22
         assert obj.away_temperature == 18.5
@@ -69,3 +70,7 @@ class TestScheduleParsing:
             assert obj.schedule[i][1] == (True, 5, 0)
             assert obj.schedule[i][2] == (False, 15, 30)
             assert obj.schedule[i][3] == (True, 24, 0)
+
+    def test_parsing_malformed_data_fail(self, malformed_data_struct):
+        with pytest.raises(ParsingError):
+            obj = Schedule.from_struct(malformed_data_struct, False)
