@@ -37,7 +37,7 @@ class TestScheduleStruct:
 
 
 class TestScheduleParsing:
-    def test_parsing(data_struct):
+    def test_parsing(self, data_struct):
         obj = Schedule.from_struct(data_struct)
         assert obj.home_temperature == 22
         assert obj.away_temperature == 18.5
