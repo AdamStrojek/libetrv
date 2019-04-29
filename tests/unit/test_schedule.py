@@ -7,7 +7,7 @@ from libetrv.schedule import Schedule
 @pytest.fixture()
 def data():
     return bytes([
-        44, 37, # home, away temperature
+        44, 37,  # home, away temperature
         0, 10, 31, 48, 0, 0,  # monday
         0, 10, 31, 48, 0, 0,  # tuesday
         0, 10, 31, 48, 0, 0,  # wednesday
@@ -20,6 +20,27 @@ def data():
 
 @pytest.fixture()
 def data_struct(data):
+    obj = ScheduleStruct()
+    obj.unpack(data)
+    return obj
+
+
+@pytest.fixture()
+def malformed_data():
+    return bytes([
+        44, 37,  # home, away temperature
+        0, 10, 31, 48, 0, 0,  # correct
+        3, 10, 31, 48, 0, 0,  # does not start from 0
+        0, 10, 31, 50, 0, 0,  # time exeeds 24h (value 48)
+        0, 10, 48, 0, 0, 0,  # does not close whole cycle
+        0, 10, 10, 31, 31, 48,  # duplicated entries
+        0, 10, 31, 48, 0, 0,  # 
+        0, 10, 31, 48, 0, 0,  # 
+    ])
+
+
+@pytest.fixture()
+def malformed_data_struct(data):
     obj = ScheduleStruct()
     obj.unpack(data)
     return obj
