@@ -41,9 +41,9 @@ def malformed_data():
 
 
 @pytest.fixture()
-def malformed_data_struct(data):
+def malformed_data_struct(malformed_data):
     obj = ScheduleStruct()
-    obj.unpack(data)
+    obj.unpack(malformed_data)
     return obj
 
 
