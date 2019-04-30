@@ -8,11 +8,8 @@ TimeSchedule = namedtuple("TimeSchedule", ['is_away', 'hour', 'minute'])
 
 
 def fix_raw_time(raw_time: int, fail_silently: bool = True) -> int:
-    if raw_time < 0:
-        result = 0
-    elif raw_time > 48:
-        result = 48
-    
+    result = max(0, min(48, raw_time))
+
     if not fail_silently and result != raw_time:
         raise ParsingError("raw_time exeeded limit")
     
