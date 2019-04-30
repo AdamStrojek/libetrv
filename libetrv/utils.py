@@ -63,7 +63,7 @@ def etrv_encode(data: bytes, key: bytes) -> bytes:
 
 
 def etrv_reverse_chunks(data: bytes):
-    result = []
+    result = bytearray()
     for i in range(0, len(data), 4):
-        result.append(data[i:i+4][::-1])
-    return b''.join(result)
+        result += data[i:i+4][::-1]
+    return result
