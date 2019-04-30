@@ -48,10 +48,6 @@ def etrv_write(handler: int, send_pin: bool = False):
     return decorator
 
 
-def etrv_repack(data: bytes, format: str):
-    return struct.pack(format, *struct.unpack('>'+format, data))
-
-
 def etrv_decode(data: bytes, key: bytes) -> bytes:
     data = etrv_reverse_chunks(data)
     data = xxtea.decrypt(data, key, padding=False, rounds=32)
