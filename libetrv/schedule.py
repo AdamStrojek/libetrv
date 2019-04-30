@@ -32,6 +32,14 @@ class Schedule:
         obj.away_temperature = data.away_temperature * .5
         for weekday, schedule in enumerate(data.schedule):
             is_away = False
+
+            if schedule.data[0] != 0:
+                if fail_silently:
+                    obj.schedule[weekday].append(TimeSchedule(is_away, 0, 0))
+                    is_away = not is_away
+                else:
+                    raise ParsingError("Schedule does not start from 0:00")
+
             for raw_time in schedule.data:
                 raw_time = fix_raw_time(raw_time, fail_silently)
                 hour, half = divmod(raw_time, 2)
