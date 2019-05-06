@@ -1,5 +1,7 @@
 # libetrv
 
+[![CircleCI](https://circleci.com/gh/AdamStrojek/libetrv.svg?style=shield)](https://circleci.com/gh/AdamStrojek/libetrv)
+
 **Library is currently under development and it is not design to be used by end user**
 
 Monitor and control your eTRV from Python. Recently Danfoss has released new TRVs that can be controlled
