@@ -40,8 +40,16 @@ class Device:
         print("Secret Key:", self._device.retrieve_secret_key())
 
     def battery(self):
-        battery = self._device.battery
-        print("Battery level: {}%".format(battery))
+        result = self._device.battery
+        print("Battery level: {}%".format(result))
+
+    def settings(self):
+        result = self._device.settings
+        print('Frost protection temperature: {:.1f}°C'.format(result.frost_protection_temperature))
+        print('Schedule mode: {}'.format(result.schedule_mode))
+        print('Vacation temperature: {:.1f}°C'.format(result.vacation_temperature))
+        print('Vacation From: {}'.format(result.vacation_from.isoformat()))
+        print('Vacation To: {}'.format(result.vacation_to.isoformat()))
 
     def temperature(self):
         temp = self._device.temperature
