@@ -90,12 +90,13 @@ class eTRVDevice(object):
 
     @etrv_read(SETTINGS_RW, True)
     def settings(self, data: SettingsStruct):
-        ret = Settings()
-        ret.frost_protection_temperature = data.frost_protection_temperature * .5
-        ret.schedule_mode = data.schedule_mode
-        ret.vacation_temperature = data.vacation_temperature * .5
-        ret.vacation_from = datetime.utcfromtimestamp(data.vacation_from)
-        ret.vacation_to = datetime.utcfromtimestamp(data.vacation_to)
+        ret = Settings(
+            data.frost_protection_temperature * .5,
+            data.schedule_mode,
+            data.vacation_temperature * .5,
+            data.vacation_from,
+            data.vacation_to
+        )
         return ret
 
     @property
