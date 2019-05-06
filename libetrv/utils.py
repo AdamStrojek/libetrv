@@ -50,14 +50,14 @@ def etrv_write(handler: int, send_pin: bool = False):
 
 def etrv_decode(data: bytes, key: bytes) -> bytes:
     data = etrv_reverse_chunks(data)
-    data = xxtea.decrypt(data, key, padding=False, rounds=32)
+    data = xxtea.decrypt(bytes(data), key, padding=False)
     data = etrv_reverse_chunks(data)
     return data
 
 
 def etrv_encode(data: bytes, key: bytes) -> bytes:
     data = etrv_reverse_chunks(data)
-    data = xxtea.encrypt(data, key, padding=False, rounds=32)
+    data = xxtea.encrypt(data, key, padding=False)
     data = etrv_reverse_chunks(data)
     return data
 
