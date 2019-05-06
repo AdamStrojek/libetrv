@@ -88,6 +88,7 @@ class eTRVDevice(object):
     def retrieve_secret_key(self, data):
         return data.hex()
 
+    @property
     @etrv_read(SETTINGS_RW, True)
     def settings(self, data: SettingsStruct):
         ret = Settings(
