@@ -1,16 +1,20 @@
 from collections import Iterable
 from functools import wraps
-from typing import Union, get_type_hints
+from typing import Union, get_type_hints, TYPE_CHECKING
 
 import xxtea
 
-from .device import eTRVDevice
+if TYPE_CHECKING:
+    from .device import eTRVDevice
 
 
-def etrv_read_data(device: eTRVDevice, handlers, send_pin: bool, decode: bool) -> bytes:
+def etrv_read_data(device: 'eTRVDevice', handlers, send_pin: bool, decode: bool) -> bytes:
     if not device.is_connected():
         device.connect(send_pin)
     complete_data = bytearray()
+
+    if not isinstance(handlers, Iterable):
+        handlers = [handlers]
 
     for handler in handlers:
         data = device.ble_device.readCharacteristic(handler)
@@ -21,7 +25,7 @@ def etrv_read_data(device: eTRVDevice, handlers, send_pin: bool, decode: bool) -
     return bytes(complete_data)
 
 
-def etrv_write_data(device: eTRVDevice, handler, data: bytes, send_pin: bool, encode: bool):
+def etrv_write_data(device: 'eTRVDevice', handler, data: bytes, send_pin: bool, encode: bool):
     if encode:
         data = etrv_encode(data, device.secret)
     if not device.is_connected():
