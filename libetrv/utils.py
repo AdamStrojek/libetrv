@@ -1,9 +1,33 @@
-import struct
 from collections import Iterable
 from functools import wraps
 from typing import Union, get_type_hints
 
 import xxtea
+
+from .device import eTRVDevice
+
+
+def etrv_read_data(device: eTRVDevice, handlers, send_pin: bool, decode: bool) -> bytes:
+    if not device.is_connected():
+        device.connect(send_pin)
+    complete_data = bytearray()
+
+    for handler in handlers:
+        data = device.ble_device.readCharacteristic(handler)
+        if decode:
+            data = etrv_decode(data, device.secret)
+        complete_data += data
+    
+    return bytes(complete_data)
+
+
+def etrv_write_data(device: eTRVDevice, handler, data: bytes, send_pin: bool, encode: bool):
+    if encode:
+        data = etrv_encode(data, device.secret)
+    if not device.is_connected():
+        device.connect(send_pin)
+    ret = device.ble_device.writeCharacteristic(handler, data, True)
+    return ret
 
 
 def etrv_read(handlers: Union[int, Iterable], send_pin: bool = False, decode: bool = True):
@@ -12,38 +36,26 @@ def etrv_read(handlers: Union[int, Iterable], send_pin: bool = False, decode: bo
     def decorator(func):
         @wraps(func)
         def wrapper(etrv):
-            if not etrv.is_connected():
-                etrv.connect(send_pin)
-            complete_data = bytearray()
-
-            for handler in handlers:
-                data = etrv.ble_device.readCharacteristic(handler)
-                if decode:
-                    data = etrv_decode(data, etrv.secret)
-                complete_data += data
+            data = etrv_read_data(etrv, handlers, send_pin, decode)
             hints = get_type_hints(func)
             cstruct_cls = hints['data']
             if cstruct_cls is not None:
                 cstruct = cstruct_cls()
-                cstruct.unpack(complete_data)
+                cstruct.unpack(data)
                 return func(etrv, cstruct)
-            return func(etrv, complete_data)
+            return func(etrv, data)
         return wrapper
     return decorator
 
 
-def etrv_write(handler: int, send_pin: bool = False):
+def etrv_write(handler: int, send_pin: bool = False, encode: bool = True):
     def decorator(func):
         @wraps(func)
         def wrapper(etrv, *args):
             data = func(etrv, *args)
             if hasattr(data, 'pack'):
                 data = data.pack()
-            data = etrv_encode(data, etrv.secret)
-            if not etrv.is_connected():
-                etrv.connect(send_pin)
-            ret = etrv.ble_device.writeCharacteristic(handler, data, True)
-            return ret
+            return etrv_write_data(etrv, handler, data, send_pin, encode)
         return wrapper
     return decorator
 
