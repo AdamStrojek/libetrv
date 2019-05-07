@@ -4,8 +4,10 @@ from .utils import etrv_read_data, etrv_write_data
 
 
 class eTRVField:
-    def __init__(self, field=None):
+    def __init__(self, field=None, read_only=False, auto_save=False):
         self.field = field
+        self.read_only = read_only
+        self.auto_save = auto_save
 
     def __set_name__(self, owner, name):
         self.name = name
@@ -16,8 +18,15 @@ class eTRVField:
         return self.from_raw_value(property.__values__[self.field], property)
 
     def __set__(self, property: 'eTRVProperty', value):
+        if self.read_only:
+            raise AttributeError("field '{}' is read-only".format(self.name))
+
         result = self.to_raw_value(value, property)
         property.__values__[self.field] = result
+        property.is_changed = True
+
+        if self.auto_save:
+            property.save()
 
     def from_raw_value(self, raw_value, property):
         return raw_value
@@ -40,17 +49,22 @@ class eTRVProperty(CStruct, metaclass=eTRVPropertyMeta):
     handler = 0
     send_pin = True
     use_encoding = True
-    auto_save = False
     read_only = False
     direct_field = None
 
     def __init__(self, data: bytes = None, **kwargs):
         super().__init__(string=data, **kwargs)
         self.populated = False
+        self.is_changed = False
+        self.device = None
+
+    def __set_device__(self, device: 'eTRVDevice'):
+        self.device = device
 
     def unpack(self, string):
         result = super().unpack(string)
         self.populated = True
+        self.is_changed = False
         return result
 
     def read(self, device: 'eTRVDevice'):
@@ -59,7 +73,10 @@ class eTRVProperty(CStruct, metaclass=eTRVPropertyMeta):
 
     def save(self, device: 'eTRVDevice'):
         data = self.pack()
-        return etrv_write_data(device, self.handler, data, self.send_pin, self.use_encoding)
+        result = etrv_write_data(device, self.handler, data, self.send_pin, self.use_encoding)
+        if result:
+            self.is_changed = False
+        return result
 
     def __get__(self, device: 'eTRVDevice', instance_type=None):
         if not self.populated:
@@ -73,12 +90,11 @@ class eTRVProperty(CStruct, metaclass=eTRVPropertyMeta):
     def __set__(self, device: 'eTRVDevice', value):
         if self.read_only:
             raise AttributeError('this attribute is read-only')
+
+        self.is_changed = True
         
         if self.direct_field is None:
             # This require modified version of cstruct
             self.__values__.update(value.__values__)
         else:
             setattr(self, self.direct_field, value)
-
-        if self.auto_save:
-            self.save(device)
