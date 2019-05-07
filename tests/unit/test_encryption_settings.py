@@ -1,5 +1,4 @@
 import pytest
-from unittest import mock
 
 from libetrv.data_struct import ScheduleMode
 from libetrv.device import eTRVDevice
