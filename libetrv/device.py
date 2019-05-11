@@ -2,9 +2,9 @@ from collections import namedtuple
 from time import sleep
 from datetime import datetime
 
-from bluepy import btle
 from loguru import logger
 
+from . import btle
 from .data_struct import ScheduleMode, SettingsStruct, TemperatureStruct, TimeStruct, BatteryStruct, ScheduleStruct
 from .schedule import Schedule
 from .utils import etrv_read, etrv_write
