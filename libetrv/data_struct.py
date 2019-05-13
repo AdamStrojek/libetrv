@@ -35,9 +35,9 @@ class eTRVField:
         return value
 
 
-class eTRVPropertyMeta(cstruct.CStructMeta):
+class eTRVDataMeta(cstruct.CStructMeta):
     def __new__(mcls, name, bases, attrs):
-        cls = super(eTRVPropertyMeta, mcls).__new__(mcls, name, bases, attrs)
+        cls = super(eTRVDataMeta, mcls).__new__(mcls, name, bases, attrs)
         for attr, obj in attrs.items():
             if isinstance(obj, eTRVField):
                 obj.__set_name__(cls, attr)
