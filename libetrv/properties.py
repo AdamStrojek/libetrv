@@ -2,36 +2,17 @@ from cstruct import CStructMeta, CStruct, BIG_ENDIAN
 
 
 class eTRVProperty:
-    __byte_order__ = BIG_ENDIAN
-    handler = 0
-    send_pin = True
-    use_encoding = True
-    read_only = False
-    direct_field = None
+    def __init__(self, name):
+        self.name = name
 
-    def __init__(self, data: bytes = None, **kwargs):
-        super().__init__(string=data, **kwargs)
-        self.populated = False
-        self.is_changed = False
-        self.device = None
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def get_data_object(self, device):
+        return device.fields[self.name]
 
     def __get__(self, device: 'eTRVDevice', instance_type=None):
-        if not self.populated:
-            self.read(device)
+        return self.get_data_object(device).retrieve(device)
 
-        if self.direct_field is None:
-            return self
-        else:
-            return getattr(self, self.direct_field)
-
-    def __set__(self, device: 'eTRVDevice', value):
-        if self.read_only:
-            raise AttributeError('this attribute is read-only')
-
-        self.is_changed = True
-        
-        if self.direct_field is None:
-            # This require modified version of cstruct
-            self.__values__.update(value.__values__)
-        else:
-            setattr(self, self.direct_field, value)
+    def __set__(self, device: 'eTRVDevice', value) -> None:
+        self.get_data_object(device).update(device, value)
