@@ -40,6 +40,7 @@ class eTRVDevice(object):
         self.secret = secret
         self.pin = b'0000' if pin is None else pin
         self.ble_device = None 
+        self.__pin_already_sent = False
     
     @staticmethod
     def scan(timeout=10.0):
@@ -79,10 +80,13 @@ class eTRVDevice(object):
         if self.ble_device is not None:
             self.ble_device.disconnect()
             self.ble_device = None
+            self.__pin_already_sent = False
 
     def send_pin(self):
-        logger.debug("Write PIN to {}", self.address)
-        self.ble_device.writeCharacteristic(eTRVDevice.PIN_W, self.pin, True)
+        if not self.__pin_already_sent:
+            logger.debug("Write PIN to {}", self.address)
+            self.ble_device.writeCharacteristic(eTRVDevice.PIN_W, self.pin, True)
+            self.__pin_already_sent = True
 
     @etrv_read(SECRET_R, True)
     def retrieve_secret_key(self, data):
