@@ -8,16 +8,17 @@ class eTRVField:
         self.field = field
         self.read_only = read_only
         self.auto_save = auto_save
+        self.name = None
 
     def __set_name__(self, owner, name):
         self.name = name
         if self.field is None:
             self.field = name
 
-    def __get__(self, property: 'eTRVProperty', instance_type=None):
-        return self.from_raw_value(property.__values__[self.field], property)
+    def __get__(self, data: 'eTRVData', instance_type=None):
+        return self.from_raw_value(data, property.__values__[self.field], property)
 
-    def __set__(self, property: 'eTRVProperty', value):
+    def __set__(self, data: 'eTRVData', value):
         if self.read_only:
             raise AttributeError("field '{}' is read-only".format(self.name))
 
@@ -28,45 +29,94 @@ class eTRVField:
         if self.auto_save:
             property.save()
 
-    def from_raw_value(self, raw_value, property):
+    def from_raw_value(self, raw_value, data):
         return raw_value
 
-    def to_raw_value(self, value, property):
+    def to_raw_value(self, value, data):
         return value
 
 
-class eTRVDataMeta(cstruct.CStructMeta):
-    def __new__(mcls, name, bases, attrs):
-        cls = super(eTRVDataMeta, mcls).__new__(mcls, name, bases, attrs)
-        for attr, obj in attrs.items():
-            if isinstance(obj, eTRVField):
-                obj.__set_name__(cls, attr)
-        return cls
+class eTRVData:
+    class Meta:
+        structure = None  # type: dict[int] = str
+        send_pin = True
+        use_encoding = True
+        read_only = False
 
-
-class eTRVData(cstruct.CStruct):
-    __byte_order__ = cstruct.BIG_ENDIAN
-
-    def __init__(self, device, data=None, **kargs):
-        super().__init__(string=data, **kargs)
+    def __init__(self, device=None):
         self.device = device
-        
-    def unpack(self, string):
-        result = super().unpack(string)
-        self.populated = True
-        self.is_changed = False
-        return result
 
-    def read(self, device: 'eTRVDevice'):
-        data = etrv_read_data(device, self.handler, self.send_pin, self.use_encoding)
-        self.unpack(data)
+        # TODO Should we switch to frozendict?
+        self.raw_data = {}
+        for handler, struct in self.Meta.structure.items():
+            class RawDataStruct(cstruct.CStruct):
+                __byte_order__ = cstruct.BIG_ENDIAN
+                __struct__ = struct
+                is_populated = False
+                is_changed = False
+
+            self.raw_data[handler] = RawDataStruct()
+
+    def retrieve(self, device: 'eTRVDevice'):
+        if not self.is_populated:
+            self.read(device)
+
+        return self.retrieve_object(device)
+
+    def retrieve_object(self, device):
+        return self
+    
+    def update(self, device: 'eTRVDevice', data):
+        pass
+
+    def update_object(self, device, data):
+        if self.Meta.read_only:
+            raise AttributeError('this attribute is read-only')
+
+    @property
+    def is_populated(self):
+        return all(filter(lambda obj: obj.is_populated, self.raw_data.values()))
+
+    @property
+    def is_changed(self):
+        return any(filter(lambda obj: obj.is_populated, self.raw_data.values()))
+
+    def read(self, device: 'eTRVDevice', handlers = None):
+        """
+        If handlers are None it will use all
+        """
+        for handler, struct in self.raw_data.items():
+            data = etrv_read_data(device, handler, self.Meta.send_pin, self.Meta.use_encoding)
+            struct.unpack(data)
+            struct.is_populated = True
+            struct.is_changed = False
 
     def save(self, device: 'eTRVDevice'):
-        data = self.pack()
-        result = etrv_write_data(device, self.handler, data, self.send_pin, self.use_encoding)
-        if result:
-            self.is_changed = False
-        return result
+        if self.Meta.read_only:
+            raise AttributeError('this attribute is read-only')
+
+        results = []
+
+        for handler, struct in self.raw_data.items():
+            data = struct.pack()
+            result = etrv_write_data(device, handler, data, self.Meta.send_pin, self.Meta.use_encoding)
+            if result:
+                struct.is_changed = False
+            results.append(result)
+
+        return all(results)
+
+
+class eTRVSingleData(eTRVData):
+    direct_field = None
+
+    def get_direct_field(self):
+        if self.direct_field is None:
+            raise AttributeError('Field direct field should be defined')
+
+    def retrieve_object(self, device):
+        return getattr(self, self.get_direct_field())
+
 
 class ScheduleMode(enum.IntEnum):
     MANUAL = 0
@@ -75,15 +125,16 @@ class ScheduleMode(enum.IntEnum):
 
 
 class SettingsStruct(eTRVData):
-    __struct__ = """
-        unsigned char _unknow1[3];
-        unsigned char _frost_protection_temperature;
-        unsigned char _schedule_mode;
-        unsigned char _vacation_temperature; 
-        int _vacation_from;
-        int _vacation_to;
-        unsigned char _unknow2[2];
-    """
+    class Meta(eTRVData.Meta):
+        __struct__ = """
+            unsigned char unknow1[3];
+            unsigned char frost_protection_temperature;
+            unsigned char schedule_mode;
+            unsigned char vacation_temperature; 
+            int vacation_from;
+            int vacation_to;
+            unsigned char unknow2[2];
+        """
 
 
 

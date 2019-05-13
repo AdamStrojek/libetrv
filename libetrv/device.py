@@ -5,17 +5,24 @@ from datetime import datetime
 from bluepy import btle
 from loguru import logger
 
-from .data_struct import ScheduleMode, SettingsStruct, TemperatureStruct, TimeStruct, BatteryStruct, ScheduleStruct
+from .data_struct import eTRVData, ScheduleMode, SettingsStruct, TemperatureStruct, TimeStruct, BatteryStruct, ScheduleStruct
+from .properties import eTRVProperty
 from .schedule import Schedule
 from .utils import etrv_read, etrv_write
 
 
-Settings = namedtuple('Settings',
-    ['frost_protection_temperature', 'schedule_mode', 'vacation_temperature', 'vacation_from', 'vacation_to']
-)
+class eTRVDeviceMeta(type):
+    def __new__(mcls, name, bases, attrs):
+        fields = {}
+        for attr, obj in attrs.items():
+            if isinstance(obj, eTRVData):
+                fields[attr] = obj
+                attrs[attr] = eTRVProperty(attr)
+        attrs['fields'] = fields
+        return super(eTRVDeviceMeta, mcls).__new__(mcls, name, bases, attrs)
 
 
-class eTRVDevice(object):
+class eTRVDevice(metaclass=eTRVDeviceMeta):
     BATTERY_LEVEL_R = 0x0010
 
     PIN_W = 0x0024
