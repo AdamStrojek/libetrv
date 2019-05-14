@@ -2,7 +2,7 @@ from collections import namedtuple
 from time import sleep
 from datetime import datetime
 
-from bluepy import btle
+from .bluetooth import btle
 from loguru import logger
 
 from .data_struct import eTRVData, ScheduleMode, SettingsStruct, TemperatureStruct, TimeStruct, BatteryStruct, ScheduleStruct
