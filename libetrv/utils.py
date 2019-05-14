@@ -73,7 +73,7 @@ def etrv_decode(data: bytes, key: bytes) -> bytes:
 
 def etrv_encode(data: bytes, key: bytes) -> bytes:
     data = etrv_reverse_chunks(data)
-    data = xxtea.encrypt(data, key, padding=False)
+    data = xxtea.encrypt(bytes(data), key, padding=False)
     data = etrv_reverse_chunks(data)
     return data
 

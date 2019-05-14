@@ -82,23 +82,26 @@ class eTRVData(metaclass=eTRVDataMeta):
         """
         If handlers are None it will use all
         """
+        send_pin = getattr(self.Meta, 'send_pin', eTRVData.Meta.send_pin)
+        use_encoding = getattr(self.Meta, 'use_encoding', eTRVData.Meta.use_encoding)
         for handler, struct in self.raw_data.items():
-            send_pin = getattr(self.Meta, 'send_pin', eTRVData.Meta.send_pin)
-            use_encoding = getattr(self.Meta, 'use_encoding', eTRVData.Meta.use_encoding)
             data = etrv_read_data(self.device, handler, send_pin, use_encoding)
             struct.unpack(data)
             struct.is_populated = True
             struct.is_changed = False
 
     def save(self):
-        if self.Meta.read_only:
+        if getattr(self.Meta, 'read_only', eTRVData.Meta.read_only):
             raise AttributeError('this attribute is read-only')
 
         results = []
 
+        send_pin = getattr(self.Meta, 'send_pin', eTRVData.Meta.send_pin)
+        use_encoding = getattr(self.Meta, 'use_encoding', eTRVData.Meta.use_encoding)
+
         for handler, struct in self.raw_data.items():
             data = struct.pack()
-            result = etrv_write_data(self.device, handler, data, self.Meta.send_pin, self.Meta.use_encoding)
+            result = etrv_write_data(self.device, handler, data, send_pin,use_encoding)
             if result:
                 struct.is_changed = False
             results.append(result)
