@@ -25,8 +25,6 @@ class TestEncryptionTemperature:
     def test_set_point_temperature(self, temperature):
         assert temperature.set_point_temperature == 23
 
-    @pytest.mark.skip('Setting values do not work correctly')
     def test_change_set_point_temperature(self, device):
-        device.ble_device.writeCharacteristic = mock.Mock(return_value=True)
         device.temperature.set_point_temperature = 15
-        assert device.ble_device.writeCharacteristic.call_count == 1
+        assert device.ble_device.handlers_history.pop() == 0x2d
