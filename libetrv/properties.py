@@ -46,7 +46,7 @@ class eTRVData(metaclass=eTRVDataMeta):
         # TODO Should we switch to frozendict?
         self.raw_data = {}
         for handler, struct in self.Meta.structure.items():
-            class RawDataStruct(cstruct.CStruct):
+            class RawDataStruct(CStruct):
                 __byte_order__ = BIG_ENDIAN
                 __struct__ = struct
                 is_populated = False
