@@ -1,7 +1,7 @@
 import enum
 
 from .properties import eTRVData, eTRVSingleData
-from .fields import eTRVField, TemperatureField, UTCDateTimeField, LocalDateTimeField
+from .fields import eTRVField, TemperatureField, UTCDateTimeField, LocalDateTimeField, EnumField
 
 
 class BatteryData(eTRVSingleData):
@@ -17,7 +17,7 @@ class BatteryData(eTRVSingleData):
         direct_field = 'battery'
 
 
-class ScheduleMode(enum.IntEnum):
+class ScheduleMode(enum.Enum):
     MANUAL = 0
     SCHEDULED = 1
     VACATION = 2
@@ -25,7 +25,7 @@ class ScheduleMode(enum.IntEnum):
 
 class SettingsData(eTRVData):
     frost_protection_temperature = TemperatureField()
-    schedule_mode = eTRVField()
+    schedule_mode = EnumField(enum_class=ScheduleMode)
     vacation_temperature = TemperatureField()
     vacation_from = UTCDateTimeField()
     vacation_to = UTCDateTimeField()

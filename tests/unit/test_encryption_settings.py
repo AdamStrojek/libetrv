@@ -30,6 +30,7 @@ class TestEncryptionSettings:
 
     def test_schedule_mode(self, settings):
         assert settings.schedule_mode == ScheduleMode.SCHEDULED
+        assert settings.schedule_mode != 1
 
     def test_vacation_temperature(self, settings):
         assert settings.vacation_temperature == 15
