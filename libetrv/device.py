@@ -13,13 +13,11 @@ from .utils import etrv_read, etrv_write
 
 class eTRVDeviceMeta(type):
     def __new__(mcls, name, bases, attrs):
-        fields = {}
+        cls = super(eTRVDeviceMeta, mcls).__new__(mcls, name, bases, attrs)
         for attr, obj in attrs.items():
-            if isinstance(obj, eTRVData):
-                fields[attr] = obj
-                attrs[attr] = eTRVProperty(attr)
-        attrs['fields'] = fields
-        return super(eTRVDeviceMeta, mcls).__new__(mcls, name, bases, attrs)
+            if isinstance(obj, eTRVProperty):
+                obj.__set_name__(cls, attr)
+        return cls
 
 
 class eTRVDevice(metaclass=eTRVDeviceMeta):
@@ -48,7 +46,9 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
         self.pin = b'0000' if pin is None else pin
         self.ble_device = None 
         self.__pin_already_sent = False
-    
+
+        self.fields = {}
+
     @staticmethod
     def scan(timeout=10.0):
         devices = btle.Scanner().scan(timeout)
