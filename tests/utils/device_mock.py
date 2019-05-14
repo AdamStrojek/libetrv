@@ -17,7 +17,7 @@ class BtleMock:
         self.handlers_history.append(handler)
         return self.test_data.get(handler, self.default_test_data)
 
-    def writeCharacteristic(self, handler, data):
+    def writeCharacteristic(self, handler, data, return_info=False):
         self.handlers_history.append(handler)
         self.sent_data_history.append(data)
         return True
