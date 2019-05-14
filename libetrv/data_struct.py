@@ -1,33 +1,49 @@
 import cstruct
 import enum
+from typing import Optional, Any, Union, Dict
 
 from .utils import etrv_read_data, etrv_write_data
 
 class eTRVField:
-    def __init__(self, field=None, read_only=False, auto_save=False):
-        self.field = field
+    def __init__(self, handler=None, name=None, read_only=False, auto_save=False):
+        self.handler = handler
         self.read_only = read_only
         self.auto_save = auto_save
-        self.name = None
+        self.name = name
 
     def __set_name__(self, owner, name):
-        self.name = name
-        if self.field is None:
-            self.field = name
+        if self.name is None:
+            self.name = name
 
     def __get__(self, data: 'eTRVData', instance_type=None):
-        return self.from_raw_value(data, property.__values__[self.field], property)
+        raw_value = None
+        if len(data.raw_data) == 1 and self.handler is None:
+            # Take first and only field
+            handler, raw_data = next(iter(data.raw_data.items()))
+            raw_value = getattr(raw_data, self.name)
+        else:
+            raw_data = data.raw_data[self.handler]
+            raw_value = getattr(raw_data, self.name)
+        return self.from_raw_value(raw_value, data)
 
     def __set__(self, data: 'eTRVData', value):
         if self.read_only:
             raise AttributeError("field '{}' is read-only".format(self.name))
 
-        result = self.to_raw_value(value, property)
-        property.__values__[self.field] = result
-        property.is_changed = True
+        value = self.to_raw_value(value, data)
 
-        if self.auto_save:
-            property.save()
+        if len(data.raw_data) == 1 and self.handler is None:
+            # Take first and only field
+            handler, raw_data = next(iter(data.raw_data.items()))
+            raw_data.is_changed = True
+            raw_value = setattr(raw_data, self.name, value)
+        else:
+            raw_data = data.raw_data[self.handler]
+            raw_data.is_changed = True
+            raw_value = setattr(raw_data, self.name, value)
+
+        # if self.auto_save:
+        #     property.save()
 
     def from_raw_value(self, raw_value, data):
         return raw_value
@@ -36,16 +52,23 @@ class eTRVField:
         return value
 
 
-class eTRVData:
+class eTRVDataMeta(type):
+    def __new__(mcls, name, bases, attrs):
+        cls = super(eTRVDataMeta, mcls).__new__(mcls, name, bases, attrs)
+        for attr, obj in attrs.items():
+            if isinstance(obj, eTRVField):
+                obj.__set_name__(cls, attr)
+        return cls
+
+
+class eTRVData(metaclass=eTRVDataMeta):
     class Meta:
-        structure = None  # type: dict[int] = str
+        structure = None  # type: Dict[int, str]
         send_pin = True
         use_encoding = True
         read_only = False
 
-    def __init__(self, device=None):
-        self.device = device
-
+    def __init__(self):
         # TODO Should we switch to frozendict?
         self.raw_data = {}
         for handler, struct in self.Meta.structure.items():
@@ -67,26 +90,28 @@ class eTRVData:
         return self
     
     def update(self, device: 'eTRVDevice', data):
-        pass
-
-    def update_object(self, device, data):
         if self.Meta.read_only:
             raise AttributeError('this attribute is read-only')
 
+    def update_object(self, device, data):
+        pass
+
     @property
     def is_populated(self):
-        return all(filter(lambda obj: obj.is_populated, self.raw_data.values()))
+        return all(map(lambda obj: obj.is_populated, self.raw_data.values()))
 
     @property
     def is_changed(self):
-        return any(filter(lambda obj: obj.is_populated, self.raw_data.values()))
+        return any(map(lambda obj: obj.is_populated, self.raw_data.values()))
 
     def read(self, device: 'eTRVDevice', handlers = None):
         """
         If handlers are None it will use all
         """
         for handler, struct in self.raw_data.items():
-            data = etrv_read_data(device, handler, self.Meta.send_pin, self.Meta.use_encoding)
+            send_pin = getattr(self.Meta, 'send_pin', eTRVData.Meta.send_pin)
+            use_encoding = getattr(self.Meta, 'use_encoding', eTRVData.Meta.use_encoding)
+            data = etrv_read_data(device, handler, send_pin, use_encoding)
             struct.unpack(data)
             struct.is_populated = True
             struct.is_changed = False
