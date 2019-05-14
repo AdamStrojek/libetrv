@@ -5,28 +5,7 @@ from libetrv.device import eTRVDevice
 from libetrv.fields import UTCDateTimeField, TemperatureField
 from libetrv.properties import eTRVProperty
 
-
-class SampleBtle:
-    default_test_data = bytes.fromhex('abcdef5cdaa618ee')
-    test_data = None
-    handlers_history = None
-    sent_data_history = None
-
-    def __init__(self, test_data=None):
-        if test_data is None:
-            test_data = {}
-        self.test_data = test_data
-        self.handlers_history = []
-        self.sent_data_history = []
-
-    def readCharacteristic(self, handler):
-        self.handlers_history.append(handler)
-        return self.test_data.get(handler, self.default_test_data)
-
-    def writeCharacteristic(self, handler, data):
-        self.handlers_history.append(handler)
-        self.sent_data_history.append(data)
-        return True
+from tests.utils.device_mock import DeviceMock
 
 
 class SampleData(eTRVData):
@@ -68,13 +47,9 @@ class ComplexData(eTRVData):
         use_encoding = False
 
 
-class SampleDevice(eTRVDevice):
+class SampleDevice(DeviceMock):
     sample_data = eTRVProperty(SampleData)
     complex_data = eTRVProperty(ComplexData)
-
-    def __init__(self, test_data=None):
-        super().__init__('aa:bb:cc:dd:ee:ff')
-        self.ble_device = SampleBtle(test_data)
 
     def is_connected(self):
         return True
