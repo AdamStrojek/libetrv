@@ -27,6 +27,7 @@ class DeviceMock(eTRVDevice):
     def __init__(self, test_data=None):
         super().__init__('aa:bb:cc:dd:ee:ff')
         self.ble_device = BtleMock(test_data)
+        self.secret = bytes.fromhex('df5b7d6a1632cca479306eb378b6e959')
 
     def is_connected(self):
         return True

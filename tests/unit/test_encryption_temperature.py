@@ -2,23 +2,15 @@ import pytest
 from unittest import mock
 
 from libetrv.data_struct import ScheduleMode
-from libetrv.device import eTRVDevice
 
-secret_key = 'df5b7d6a1632cca479306eb378b6e959'
-
-temperature_value = '8603601eaBa0f78e'
-
-
-class PeripheralMock:
-    def readCharacteristic(self, handler):
-        return bytes.fromhex(temperature_value)
+from tests.utils.device_mock import DeviceMock
 
 
 @pytest.fixture()
 def device():
-    dev = eTRVDevice("00:11:22:33:44:55", secret=bytes.fromhex(secret_key))
-    dev.is_connected = lambda: True
-    dev.ble_device = PeripheralMock()
+    dev = DeviceMock({
+        0x2d: bytes.fromhex('8603601eaBa0f78e')
+    })
     return dev
 
 @pytest.fixture()
