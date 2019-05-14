@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from .properties import eTRVField
+from .data_struct import eTRVField
 
 
 class TemperatureField(eTRVField):
@@ -28,7 +28,7 @@ class UTCDateTimeField(eTRVField):
 
 
 class LocalDateTimeField(eTRVField):
-    def __init__(self, tz_field, *args, **kwargs):
+    def __init__(self, *args, tz_field, **kwargs):
         super().__init__(*args, **kwargs)
         self.tz_field = tz_field
 
