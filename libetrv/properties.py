@@ -47,7 +47,7 @@ class eTRVData(metaclass=eTRVDataMeta):
         self.raw_data = {}
         for handler, struct in self.Meta.structure.items():
             class RawDataStruct(cstruct.CStruct):
-                __byte_order__ = cstruct.BIG_ENDIAN
+                __byte_order__ = BIG_ENDIAN
                 __struct__ = struct
                 is_populated = False
                 is_changed = False
@@ -107,7 +107,6 @@ class eTRVData(metaclass=eTRVDataMeta):
 
 
 class eTRVSingleData(eTRVData):
-    direct_field = None
 
     def get_direct_field(self):
         if self.direct_field is None:
@@ -115,3 +114,6 @@ class eTRVSingleData(eTRVData):
 
     def retrieve_object(self):
         return getattr(self, self.get_direct_field())
+
+    class Meta:
+        direct_field = None
