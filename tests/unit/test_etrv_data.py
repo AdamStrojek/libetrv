@@ -1,7 +1,9 @@
+import pytest
 from datetime import datetime
 from libetrv.data_struct import eTRVData, eTRVField
-from libetrv.device import eTRVDeviceMeta
+from libetrv.device import eTRVDevice
 from libetrv.fields import UTCDateTimeField, TemperatureField
+from libetrv.properties import eTRVProperty
 
 
 class SampleBtle:
@@ -47,7 +49,8 @@ class SampleData(eTRVData):
 
 class ComplexData(eTRVData):
     datetime = UTCDateTimeField(0x01, 'field3')
-    room_temp = TemperatureField(0x02, 'temp1')
+    room_temp = TemperatureField(0x02, 'temp1', read_only=True)
+    set_temp = TemperatureField(0x02)
 
     class Meta:
         structure = {
@@ -59,16 +62,18 @@ class ComplexData(eTRVData):
             """,
             0x02: """
                 unsigned char temp1;
+                unsigned char set_temp;
             """,
         }
         use_encoding = False
 
 
-class SampleDevice(metaclass=eTRVDeviceMeta):
-    sample_data = SampleData()
-    complex_data = ComplexData()
+class SampleDevice(eTRVDevice):
+    sample_data = eTRVProperty(SampleData)
+    complex_data = eTRVProperty(ComplexData)
 
     def __init__(self, test_data=None):
+        super().__init__('aa:bb:cc:dd:ee:ff')
         self.ble_device = SampleBtle(test_data)
 
     def is_connected(self):
@@ -77,7 +82,8 @@ class SampleDevice(metaclass=eTRVDeviceMeta):
 
 class TestData:
     def test_init_data(self):
-        obj = SampleData()
+        with pytest.raises(TypeError):
+            obj = SampleData()
 
     def test_init_device(self):
         obj = SampleDevice()
@@ -94,8 +100,44 @@ class TestData:
     def test_retrive_complex_data(self):
         obj = SampleDevice({
             0x01: bytes.fromhex('abcdef5cdaa618ee'),
-            0x02: bytes.fromhex('2c'),
+            0x02: bytes.fromhex('2c2c'),
         })
         assert obj.complex_data.datetime == datetime(2019, 5, 14, 11, 27, 20)
         assert obj.complex_data.room_temp == 22
         assert obj.complex_data.raw_data[0x02].temp1 == 44
+
+    def test_set_data(self):
+        obj = SampleDevice({
+            0x01: bytes.fromhex('abcdef5cdaa618ee'),
+            0x02: bytes.fromhex('2c2c'),
+        })
+        with pytest.raises(AttributeError):
+            obj.complex_data.room_temp = 20
+        assert obj.complex_data.set_temp == 22
+        obj.complex_data.set_temp = 20
+        assert obj.complex_data.set_temp == 20
+        assert obj.complex_data.raw_data[0x02].set_temp == 40
+
+    def test_multiple_devices(self):
+        """
+        This test check does descriptors correctly save info in object
+        instead of class. There should be possibility to use multiple devices
+        at same time
+        """
+        dev_a = SampleDevice()
+        dev_b = SampleDevice()
+        
+        assert dev_a.sample_data.field1 == 0xab
+        assert dev_a.sample_data.field2 == 0xcdef
+        assert dev_a.sample_data.field3 == datetime(2019, 5, 14, 11, 27, 20)
+        assert dev_a.sample_data.field4 == 0xee
+
+        assert dev_b.sample_data.field1 == 0xab
+        assert dev_b.sample_data.field2 == 0xcdef
+        assert dev_b.sample_data.field3 == datetime(2019, 5, 14, 11, 27, 20)
+        assert dev_b.sample_data.field4 == 0xee
+
+        dev_a.sample_data.field1 = 0xfa
+
+        assert dev_a.sample_data.field1 == 0xfa
+        assert dev_b.sample_data.field1 == 0xab
