@@ -5,9 +5,8 @@ from datetime import datetime
 from .bluetooth import btle
 from loguru import logger
 
-from .data_struct import eTRVData, ScheduleMode, SettingsStruct, TemperatureStruct, TimeStruct, BatteryStruct, ScheduleStruct
+from .data_struct import BatteryData, SettingsData, TemperatureData, CurrentTimeData, SecretKeyData
 from .properties import eTRVProperty
-from .schedule import Schedule
 from .utils import etrv_read, etrv_write
 
 
@@ -21,17 +20,9 @@ class eTRVDeviceMeta(type):
 
 
 class eTRVDevice(metaclass=eTRVDeviceMeta):
-    BATTERY_LEVEL_R = 0x0010
-
     PIN_W = 0x0024
 
-    SETTINGS_RW = 0x002a
-
-    TEMPERATURE_RW = 0x002d
-
     DEVICE_NAME_RW = 0x0030
-
-    TIME_RW = 0x0036
 
     SECRET_R = 0x003f
 
@@ -99,59 +90,11 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
     def retrieve_secret_key(self, data):
         return data.hex()
 
-    @property
-    @etrv_read(SETTINGS_RW, True)
-    def settings(self, data: SettingsStruct):
-        ret = Settings(
-            data.frost_protection_temperature * .5,
-            data.schedule_mode,
-            data.vacation_temperature * .5,
-            data.vacation_from,
-            data.vacation_to
-        )
-        return ret
+    battery = eTRVProperty(BatteryData)
 
-    @property
-    @etrv_read(TEMPERATURE_RW, True)
-    def temperature(self, data: TemperatureStruct):
-        """
-        This property will return both current and set point temperature
-        """
-        room_temp = data.room_temperature * .5
-        set_temp = data.set_point_temperature * .5
-        return room_temp, set_temp
+    settings = eTRVProperty(SettingsData)
 
-    @property
-    def room_temperature(self):
-        """
-        This property will return current temperature measured on device with precision up to 0.5 degrees
-        """
-        room_temp, _ = self.temperature
-        return room_temp
-
-    @property
-    def set_point_temperature(self):
-        """
-        This property is responsible for set point temperature. It will allow you to not only retrieve
-        current value, but also set new. Temperature will be always rounded to 0.5 degree
-        """
-        _, set_temp = self.temperature
-        return set_temp
-
-    @set_point_temperature.setter
-    @etrv_write(TEMPERATURE_RW, True)
-    def set_point_temperature(self, value: float) -> TemperatureStruct:
-        temp = TemperatureStruct()
-        temp.set_point_temperature = int(value*2)
-        return temp
-
-    @property
-    @etrv_read(BATTERY_LEVEL_R, True, False)
-    def battery(self, data: BatteryStruct):
-        """
-        This property will return current battery level in integer
-        """
-        return data.battery
+    temperature = eTRVProperty(TemperatureData)
 
     @property
     @etrv_read(DEVICE_NAME_RW, True)
@@ -160,14 +103,13 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
         data = data.strip(b'\0')
         return data.decode('ascii')
 
-    @property
-    @etrv_read(TIME_RW, True)
-    def time(self, data: TimeStruct):
-        return datetime.utcfromtimestamp(data.time_local-data.time_offset)
+    current_time = eTRVProperty(CurrentTimeData)
 
-    @property
-    @etrv_read(SCHEDULE_RW, True)
-    def schedule(self, data: ScheduleStruct) -> Schedule:
-        s = Schedule()
-        s.parse_struct(data)
-        return s
+    secret_key = eTRVProperty(SecretKeyData)
+
+    # @property
+    # @etrv_read(SCHEDULE_RW, True)
+    # def schedule(self, data: ScheduleStruct) -> Schedule:
+    #     s = Schedule()
+    #     s.parse_struct(data)
+    #     return s
