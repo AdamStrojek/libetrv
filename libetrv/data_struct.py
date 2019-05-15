@@ -1,7 +1,8 @@
 import enum
 
 from .properties import eTRVData, eTRVSingleData
-from .fields import eTRVField, TemperatureField, UTCDateTimeField, LocalDateTimeField, EnumField
+from .fields import eTRVField, TemperatureField, UTCDateTimeField, LocalDateTimeField, EnumField, \
+    HexField, TextField
 
 
 class BatteryData(eTRVSingleData):
@@ -58,6 +59,18 @@ class TemperatureData(eTRVData):
         }
 
 
+class NameData(eTRVSingleData):
+    name = TextField(max_length=16, auto_save=True)
+
+    class Meta:
+        structure = {
+            0x30: """
+                char name[16];
+            """
+        }
+        direct_field = 'name'
+
+
 class CurrentTimeData(eTRVSingleData):
     current_time = LocalDateTimeField('time_local', tz_field='time_offset')
 
@@ -72,7 +85,7 @@ class CurrentTimeData(eTRVSingleData):
 
 
 class SecretKeyData(eTRVSingleData):
-    key = eTRVField(read_only=True)
+    key = HexField(read_only=True)
 
     class Meta:
         structure = {

@@ -5,7 +5,7 @@ from datetime import datetime
 from .bluetooth import btle
 from loguru import logger
 
-from .data_struct import BatteryData, SettingsData, TemperatureData, CurrentTimeData, SecretKeyData
+from .data_struct import BatteryData, SettingsData, TemperatureData, CurrentTimeData, SecretKeyData, NameData
 from .properties import eTRVProperty
 from .utils import etrv_read, etrv_write
 
@@ -20,14 +20,6 @@ class eTRVDeviceMeta(type):
 
 
 class eTRVDevice(metaclass=eTRVDeviceMeta):
-    PIN_W = 0x0024
-
-    DEVICE_NAME_RW = 0x0030
-
-    SECRET_R = 0x003f
-
-    SCHEDULE_RW = []  # "1002000D-2749-0001-0000-00805F9B042F", "1002000E-2749-0001-0000-00805F9B042F", "1002000F-2749-0001-0000-00805F9B042F"
-
     def __init__(self, address, secret=None, pin=None):
         """
         Constructor for eTRVDevice
@@ -83,12 +75,9 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
     def send_pin(self):
         if not self.__pin_already_sent:
             logger.debug("Write PIN to {}", self.address)
-            self.ble_device.writeCharacteristic(eTRVDevice.PIN_W, self.pin, True)
+            pin_handler = 0x24
+            self.ble_device.writeCharacteristic(pin_handler, self.pin, True)
             self.__pin_already_sent = True
-
-    @etrv_read(SECRET_R, True)
-    def retrieve_secret_key(self, data):
-        return data.hex()
 
     battery = eTRVProperty(BatteryData)
 
@@ -96,12 +85,7 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
 
     temperature = eTRVProperty(TemperatureData)
 
-    @property
-    @etrv_read(DEVICE_NAME_RW, True)
-    def device_name(self, data: bytes) -> str:
-        # TODO This function do not work properly, need to fix later
-        data = data.strip(b'\0')
-        return data.decode('ascii')
+    name = eTRVProperty(NameData)
 
     current_time = eTRVProperty(CurrentTimeData)
 
@@ -113,3 +97,4 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
     #     s = Schedule()
     #     s.parse_struct(data)
     #     return s
+    # "1002000D-2749-0001-0000-00805F9B042F", "1002000E-2749-0001-0000-00805F9B042F", "1002000F-2749-0001-0000-00805F9B042F"
