@@ -53,33 +53,17 @@ class Device:
 
     def temperature(self):
         temp = self._device.temperature
-        print("Current temperature: {:.1f}°C".format(temp[1]))
-        print("Set temperature: {:.1f}°C".format(temp[0]))
+        print("Current temperature: {:.1f}°C".format(temp.room_temperature))
+        print("Set point temperature: {:.1f}°C".format(temp.set_point_temperature))
 
     def name(self):
         device_name = self._device.device_name
         print("Device name: '{}'".format(device_name))
 
-    def time(self):
-        time_utc = self._device.time
+    def current_time(self):
+        time_utc = self._device.current_time
         print("Current time: {}".format(time.strftime('%Y-%m-%d %H:%M:%S %Z')))
 
-class Temperature:
-    """
-    Control temperature for selected thermostat
-    """
-
-    def __init__(self, pin, secret):
-        self._pin = pin
-        self._secret = secret
-
-    def get(self):
-        """Get currently set temperature for thermostat"""
-        pass
-    
-    def set(self, value):
-        """Set new templerature in manual mode for thermostat"""
-        pass
 
 if __name__ == "__main__":
     fire.Fire(CLI)
