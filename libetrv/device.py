@@ -20,10 +20,6 @@ class eTRVDeviceMeta(type):
 
 
 class eTRVDevice(metaclass=eTRVDeviceMeta):
-    PIN_W = 0x0024
-
-    SCHEDULE_RW = []  # "1002000D-2749-0001-0000-00805F9B042F", "1002000E-2749-0001-0000-00805F9B042F", "1002000F-2749-0001-0000-00805F9B042F"
-
     def __init__(self, address, secret=None, pin=None):
         """
         Constructor for eTRVDevice
@@ -79,7 +75,8 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
     def send_pin(self):
         if not self.__pin_already_sent:
             logger.debug("Write PIN to {}", self.address)
-            self.ble_device.writeCharacteristic(eTRVDevice.PIN_W, self.pin, True)
+            pin_handler = 0x24
+            self.ble_device.writeCharacteristic(pin_handler, self.pin, True)
             self.__pin_already_sent = True
 
     battery = eTRVProperty(BatteryData)
@@ -100,3 +97,4 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
     #     s = Schedule()
     #     s.parse_struct(data)
     #     return s
+    # "1002000D-2749-0001-0000-00805F9B042F", "1002000E-2749-0001-0000-00805F9B042F", "1002000F-2749-0001-0000-00805F9B042F"
