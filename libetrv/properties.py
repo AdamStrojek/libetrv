@@ -64,8 +64,11 @@ class eTRVData(metaclass=eTRVDataMeta):
         return self
 
     def update(self, data):
-        if self.Meta.read_only:
+        read_only = getattr(self.Meta, 'read_only', eTRVData.Meta.read_only)
+        if read_only:
             raise AttributeError('this attribute is read-only')
+
+        self.update_object(self.device, data)
 
     def update_object(self, device, data):
         pass
@@ -119,6 +122,9 @@ class eTRVSingleData(eTRVData):
 
     def retrieve_object(self, device):
         return getattr(self, self.get_direct_field())
+
+    def update_object(self, device, data):
+        return setattr(self, self.get_direct_field(), data)
 
     class Meta:
         direct_field = None
