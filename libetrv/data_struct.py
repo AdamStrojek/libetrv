@@ -21,7 +21,8 @@ class BatteryData(eTRVSingleData):
 class ScheduleMode(enum.Enum):
     MANUAL = 0
     SCHEDULED = 1
-    VACATION = 2
+    VACATION = 3
+    HOLD = 5
 
 
 class SettingsData(eTRVData):
