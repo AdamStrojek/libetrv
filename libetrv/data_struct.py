@@ -2,7 +2,7 @@ import enum
 
 from .properties import eTRVData, eTRVSingleData
 from .fields import eTRVField, TemperatureField, UTCDateTimeField, LocalDateTimeField, EnumField, \
-    HexField, TextField
+    HexField, TextField, DailyScheduleField
 
 
 class BatteryData(eTRVSingleData):
@@ -98,8 +98,16 @@ class SecretKeyData(eTRVSingleData):
 
 
 class ScheduleData(eTRVData):
-    home_temperature = TemperatureField()
-    away_temperature = TemperatureField()
+    home_temperature = TemperatureField(0x45)
+    away_temperature = TemperatureField(0x45)
+
+    monday = DailyScheduleField(0x45)
+    tuesday = DailyScheduleField(0x45)
+    wednesday = DailyScheduleField(0x45)
+    thursday = DailyScheduleField(0x48)
+    friday = DailyScheduleField(0x48)
+    saturday = DailyScheduleField(0x4b)
+    sunday = DailyScheduleField(0x4b)
 
     class Meta:
         structure = {
