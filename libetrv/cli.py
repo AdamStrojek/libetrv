@@ -2,6 +2,13 @@ import time
 import fire
 from libetrv.device import eTRVDevice
 
+
+def time_to_str(datetime):
+    if datetime is not None:
+        return datetime.strftime('%Y-%m-%d %H:%M:%S %Z')
+    return None
+
+
 class CLI:
     def __init__(self, pin=b'0000', secret=None):
         self._pin = pin
@@ -37,7 +44,7 @@ class Device:
             "You can achieve that by pressing button on device"
         )
         time.sleep(5)
-        print("Secret Key:", self._device.retrieve_secret_key())
+        print("Secret Key:", self._device.secret_key)
 
     def battery(self):
         result = self._device.battery
@@ -46,23 +53,23 @@ class Device:
     def settings(self):
         result = self._device.settings
         print('Frost protection temperature: {:.1f}°C'.format(result.frost_protection_temperature))
-        print('Schedule mode: {}'.format(result.schedule_mode))
-        print('Vacation temperature: {:.1f}°C'.format(result.vacation_temperature))
-        print('Vacation From: {}'.format(result.vacation_from.isoformat()))
-        print('Vacation To: {}'.format(result.vacation_to.isoformat()))
+        print('Schedule mode:                {}'.format(result.schedule_mode))
+        print('Vacation temperature:         {:.1f}°C'.format(result.vacation_temperature))
+        print('Vacation From:                {}'.format(time_to_str(result.vacation_from)))
+        print('Vacation To:                  {}'.format(time_to_str(result.vacation_to)))
 
     def temperature(self):
         temp = self._device.temperature
-        print("Current temperature: {:.1f}°C".format(temp.room_temperature))
-        print("Set point temperature: {:.1f}°C".format(temp.set_point_temperature))
+        print("Current room temperature: {:.1f}°C".format(temp.room_temperature))
+        print("Set point temperature:    {:.1f}°C".format(temp.set_point_temperature))
 
     def name(self):
-        device_name = self._device.device_name
+        device_name = self._device.name
         print("Device name: '{}'".format(device_name))
 
     def current_time(self):
         time_utc = self._device.current_time
-        print("Current time: {}".format(time.strftime('%Y-%m-%d %H:%M:%S %Z')))
+        print("Current time: {}".format(time_to_str(time)))
 
 
 if __name__ == "__main__":
