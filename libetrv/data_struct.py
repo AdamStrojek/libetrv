@@ -52,8 +52,8 @@ class TemperatureData(eTRVData):
     class Meta:
         structure = {
             0x2d: """
-                unsigned char room_temperature;
                 unsigned char set_point_temperature;
+                unsigned char room_temperature;
                 unsigned char padding[6];
             """
         }
