@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import List
 
 from .base import eTRVField
 
@@ -30,3 +31,9 @@ class DailyScheduleField(eTRVField):
                 break
         
         return items
+
+    def to_raw_value(self, value: List[TimeSchedule], property):
+        result = [0]*6
+        for i, entry in enumerate(value):
+            result[i] = entry.hour*2 + int(entry.minute >= 30)
+        return result
