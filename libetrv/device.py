@@ -5,7 +5,7 @@ from datetime import datetime
 from .bluetooth import btle
 from loguru import logger
 
-from .data_struct import BatteryData, SettingsData, TemperatureData, CurrentTimeData, SecretKeyData, NameData
+from .data_struct import BatteryData, SettingsData, TemperatureData, NameData, CurrentTimeData, SecretKeyData, ScheduleData
 from .properties import eTRVProperty
 from .utils import etrv_read, etrv_write
 
@@ -91,10 +91,4 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
 
     secret_key = eTRVProperty(SecretKeyData)
 
-    # @property
-    # @etrv_read(SCHEDULE_RW, True)
-    # def schedule(self, data: ScheduleStruct) -> Schedule:
-    #     s = Schedule()
-    #     s.parse_struct(data)
-    #     return s
-    # "1002000D-2749-0001-0000-00805F9B042F", "1002000E-2749-0001-0000-00805F9B042F", "1002000F-2749-0001-0000-00805F9B042F"
+    schedule = eTRVProperty(ScheduleData)
