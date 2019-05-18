@@ -97,15 +97,25 @@ class SecretKeyData(eTRVSingleData):
         use_encoding = False
 
 
-# class DaySchedule(eTRVData):
-#     __struct__ = """
-#         unsigned char _data[6];
-#     """
+class ScheduleData(eTRVData):
+    home_temperature = TemperatureField()
+    away_temperature = TemperatureField()
 
-
-# class ScheduleStruct(eTRVData):
-#     __struct__ = """
-#         unsigned char _home_temperature;
-#         unsigned char _away_temperature;
-#         struct DaySchedule _schedule[7];
-#     """
+    class Meta:
+        structure = {
+            0x45: """
+                unsigned char home_temperature;
+                unsigned char away_temperature;
+                unsigned char monday[6];
+                unsigned char tuesday[6];
+                unsigned char wednesday[6];
+            """,
+            0x48: """
+                unsigned char thursday[6];
+                unsigned char friday[6];
+            """,
+            0x4b: """
+                unsigned char saturday[6];
+                unsigned char sunday[6];
+            """,
+        }
