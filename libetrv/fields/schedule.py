@@ -13,7 +13,7 @@ def fix_raw_time(raw_time: int) -> int:
 
 
 class DailyScheduleField(eTRVField):
-    def from_raw_value(self, raw_value, property) -> Generator[TimeSchedule]:
+    def from_raw_value(self, raw_value, property):
         """
         RAW data from device have it own format. It is array of 6 short integers (char),
         by default 0 filled. Each value is saving information about hour and half. To
