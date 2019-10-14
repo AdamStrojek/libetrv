@@ -17,10 +17,6 @@ class DailyScheduleField(eTRVField):
         items = []
         is_away = False
 
-        if raw_value[0] != 0:
-            items.append(TimeSchedule(is_away, 0, 0))
-            is_away = not is_away
-
         for raw_time in raw_value:
             raw_time = fix_raw_time(raw_time)
             hour, half = divmod(raw_time, 2)
