@@ -117,7 +117,7 @@ class eTRVSingleData(eTRVData):
     def get_direct_field(self):
         direct_field = getattr(self.Meta, 'direct_field', None)
         if direct_field is None:
-            raise AttributeError('Field direct field should be defined')
+            raise AttributeError('Field "direct_field" should be defined or "get_direct_field" should be implemented')
         return direct_field
 
     def retrieve_object(self, device):

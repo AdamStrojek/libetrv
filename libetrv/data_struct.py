@@ -95,6 +95,7 @@ class SecretKeyData(eTRVSingleData):
             """
         }
         use_encoding = False
+        direct_field = 'key'
 
 
 # class DaySchedule(eTRVData):
