@@ -26,6 +26,8 @@ class ScheduleMode(enum.Enum):
 
 
 class SettingsData(eTRVData):
+    temperature_min = TemperatureField()
+    temperature_max = TemperatureField()
     frost_protection_temperature = TemperatureField()
     schedule_mode = EnumField(enum_class=ScheduleMode)
     vacation_temperature = TemperatureField()
@@ -35,7 +37,9 @@ class SettingsData(eTRVData):
     class Meta:
         structure = {
             0x2a: """
-                unsigned char unknow1[3];
+                unsigned char unknow1;
+                unsigned char temperature_min;
+                unsigned char temperature_max;
                 unsigned char frost_protection_temperature;
                 unsigned char schedule_mode;
                 unsigned char vacation_temperature; 
