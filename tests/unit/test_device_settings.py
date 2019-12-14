@@ -17,6 +17,24 @@ def settings(device):
     return device.settings
 
 class TestEncryptionSettings:
+    def test_adaptable_regulation(self, settings):
+        assert settings.adaptable_regulation == True
+
+    def test_vertical_instalation(self, settings):
+        assert settings.vertical_instalation == False
+
+    def test_display_flip(self, settings):
+        assert settings.display_flip == False
+
+    def test_slow_regulation(self, settings):
+        assert settings.slow_regulation == True
+
+    def test_valve_installed(self, settings):
+        assert settings.valve_installed == True
+
+    def test_lock_control(self, settings):
+        assert settings.lock_control == False
+
     def test_minimum_available_temperature(self, settings):
         assert settings.temperature_min == 6.0
 
