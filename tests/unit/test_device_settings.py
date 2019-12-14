@@ -17,6 +17,12 @@ def settings(device):
     return device.settings
 
 class TestEncryptionSettings:
+    def test_minimum_available_temperature(self, settings):
+        assert settings.temperature_min == 6.0
+
+    def test_maximum_available_temperature(self, settings):
+        assert settings.temperature_max == 28.0
+
     def test_frost_protection_temperature(self, settings):
         assert settings.frost_protection_temperature == 6
 
