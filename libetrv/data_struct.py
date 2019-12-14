@@ -45,7 +45,7 @@ class SettingsData(eTRVData):
                 unsigned char vacation_temperature; 
                 int vacation_from;
                 int vacation_to;
-                unsigned char unknow2[2];
+                unsigned char padding[2];
             """
         }
 
