@@ -2,7 +2,7 @@ import enum
 
 from .properties import eTRVData, eTRVSingleData
 from .fields import eTRVField, TemperatureField, UTCDateTimeField, LocalDateTimeField, EnumField, \
-    HexField, TextField
+    HexField, TextField, BitField
 
 
 class BatteryData(eTRVSingleData):
@@ -24,8 +24,22 @@ class ScheduleMode(enum.Enum):
     VACATION = 3
     HOLD = 5
 
+class ConfigBits(enum.IntEnum):
+    ADAPTABLE_REGULATION = 0
+    VERTICAL_INSTALATION = 2
+    DISPLAY_FLIP = 3
+    SLOW_REGULATION = 4
+    VALVE_INSTALLED = 6
+    LOCK_CONTROL = 7
+
 
 class SettingsData(eTRVData):
+    adaptable_regulation = BitField(name='config_bits', bit_position=ConfigBits.ADAPTABLE_REGULATION)
+    vertical_instalation = BitField(name='config_bits', bit_position=ConfigBits.VERTICAL_INSTALATION)
+    display_flip = BitField(name='config_bits', bit_position=ConfigBits.DISPLAY_FLIP)
+    slow_regulation = BitField(name='config_bits', bit_position=ConfigBits.SLOW_REGULATION)
+    valve_installed = BitField(name='config_bits', bit_position=ConfigBits.VALVE_INSTALLED)
+    lock_control = BitField(name='config_bits', bit_position=ConfigBits.LOCK_CONTROL)
     temperature_min = TemperatureField()
     temperature_max = TemperatureField()
     frost_protection_temperature = TemperatureField()
@@ -37,7 +51,7 @@ class SettingsData(eTRVData):
     class Meta:
         structure = {
             0x2a: """
-                unsigned char unknow1;
+                unsigned char config_bits;
                 unsigned char temperature_min;
                 unsigned char temperature_max;
                 unsigned char frost_protection_temperature;
