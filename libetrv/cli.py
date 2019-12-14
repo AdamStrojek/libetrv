@@ -37,7 +37,7 @@ class Device:
         ch = self._device.ble_device.getCharacteristics(uuid=uuid)[0]
         print("Handler: 0x{:02X}".format(ch.getHandle()))
 
-    def retrive_key(self):
+    def retrieve_key(self):
         print(
             "In 5 seconds this script will try to retrieve a secure key from eTRV device. "
             "Don't forget to save it for later. Before that be sure that device is in pairing mode. "
@@ -70,6 +70,9 @@ class Device:
     def current_time(self):
         time_utc = self._device.current_time
         print("Current time: {}".format(time_to_str(time)))
+        
+    def set_setpoint(self,setpoint)
+        self._device.temperature.set_point_temperature = setpoint
 
 
 if __name__ == "__main__":
