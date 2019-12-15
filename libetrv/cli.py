@@ -71,7 +71,7 @@ class Device:
         time_utc = self._device.current_time
         print("Current time: {}".format(time_to_str(time)))
         
-    def set_setpoint(self,setpoint)
+    def set_setpoint(self, setpoint)
         self._device.temperature.set_point_temperature = setpoint
 
 
