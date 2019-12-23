@@ -20,7 +20,7 @@ class eTRVDeviceMeta(type):
 
 
 class eTRVDevice(metaclass=eTRVDeviceMeta):
-    def __init__(self, address, secret=None, pin=None):
+    def __init__(self, address, pin=None, secret=None):
         """
         Constructor for eTRVDevice
         """
