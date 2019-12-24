@@ -26,7 +26,7 @@ class ScheduleMode(enum.Enum):
 
 class ConfigBits(enum.IntEnum):
     ADAPTABLE_REGULATION = 0
-    VERTICAL_INSTALATION = 2
+    VERTICAL_INSTALLATION = 2
     DISPLAY_FLIP = 3
     SLOW_REGULATION = 4
     VALVE_INSTALLED = 6
@@ -35,7 +35,7 @@ class ConfigBits(enum.IntEnum):
 
 class SettingsData(eTRVData):
     adaptable_regulation = BitField(name='config_bits', bit_position=ConfigBits.ADAPTABLE_REGULATION)
-    vertical_instalation = BitField(name='config_bits', bit_position=ConfigBits.VERTICAL_INSTALATION)
+    vertical_installation = BitField(name='config_bits', bit_position=ConfigBits.VERTICAL_INSTALLATION)
     display_flip = BitField(name='config_bits', bit_position=ConfigBits.DISPLAY_FLIP)
     slow_regulation = BitField(name='config_bits', bit_position=ConfigBits.SLOW_REGULATION)
     valve_installed = BitField(name='config_bits', bit_position=ConfigBits.VALVE_INSTALLED)
