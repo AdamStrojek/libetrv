@@ -54,9 +54,13 @@ class Device:
         result = self._device.settings
         print('Frost protection temperature: {:.1f}°C'.format(result.frost_protection_temperature))
         print('Schedule mode:                {}'.format(result.schedule_mode))
+        print('Temp min:                     {}'.format(result.temperature_min))
+        print('Temp max:                     {}'.format(result.temperature_max))
         print('Vacation temperature:         {:.1f}°C'.format(result.vacation_temperature))
         print('Vacation From:                {}'.format(time_to_str(result.vacation_from)))
         print('Vacation To:                  {}'.format(time_to_str(result.vacation_to)))
+        print('Adaptive:                     {}'.format(result.adaptable_regulation))
+        print('Slow:                         {}'.format(result.slow_regulation))
 
     def temperature(self):
         temp = self._device.temperature
@@ -74,6 +78,15 @@ class Device:
     def set_setpoint(self, setpoint):
         self._device.temperature.set_point_temperature = setpoint
 
+    ## CUSTOM (TMP)
+    
+    def get_battery(self):
+        return self._device.battery
+    def get_name(self):
+        return self._device.name
+    def get_temperature(self):
+        temp = self._device.temperature
+        return str(temp.room_temperature) + "|" + str(temp.set_point_temperature)
 
 if __name__ == "__main__":
     fire.Fire(CLI)
