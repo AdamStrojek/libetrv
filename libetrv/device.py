@@ -20,7 +20,7 @@ class eTRVDeviceMeta(type):
 
 
 class eTRVDevice(metaclass=eTRVDeviceMeta):
-    def __init__(self, address, secret=None, pin=None):
+    def __init__(self, address, secret=None, pin=None, retry_limit=None):
         """
         Constructor for eTRVDevice
         """
@@ -31,6 +31,7 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
         self.__pin_already_sent = False
 
         self.fields = {}
+        self.retry_limit=retry_limit
 
     @staticmethod
     def scan(timeout=10.0):
@@ -55,7 +56,9 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
             logger.debug("Device already connected {}", self.address)
             return
 
-        while True:
+        retry_limit=self.retry_limit
+
+        while retry_limit == None or retry_limit>=0:
             try:
                 self.ble_device = btle.Peripheral(self.address)
                 if send_pin:
@@ -63,6 +66,10 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
                 break
             except btle.BTLEDisconnectError:
                 logger.error("Unable connect to {}. Retrying in 100ms", self.address)
+                if retry_limit != None:
+                    retry_limit-=1
+                    if retry_limit<0:
+                        raise
                 sleep(0.1)
 
     def disconnect(self):
