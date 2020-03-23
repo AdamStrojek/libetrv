@@ -9,5 +9,6 @@ setup(
     description='Monitor and control your eTRV from Python',
     author='Adam Strojek',
     author_email='adam@strojek.info',
-    packages=['libetrv', ],
+    packages=['libetrv', 'libetrv.fields'],
+    install_requires=['fire', 'bluepy', 'xxtea', 'loguru', 'cstruct']
 )
