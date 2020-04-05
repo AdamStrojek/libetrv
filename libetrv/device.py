@@ -78,6 +78,9 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
             self.ble_device.disconnect()
             self.ble_device = None
             self.__pin_already_sent = False
+            for field in self.fields.values():
+                field.invalidate()
+
 
     def send_pin(self):
         if not self.__pin_already_sent:

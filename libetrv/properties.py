@@ -111,6 +111,11 @@ class eTRVData(metaclass=eTRVDataMeta):
 
         return all(results)
 
+    def invalidate(self):
+        for struct in self.raw_data.values():
+            struct.is_populated = False
+            struct.is_changed = False
+
 
 class eTRVSingleData(eTRVData):
 
