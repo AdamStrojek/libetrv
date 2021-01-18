@@ -15,6 +15,6 @@ class TestEncryptionTemperature:
     def test_read_battery(self, device):
         assert device.battery == 89
 
-    def test_write_battry(self, device):
+    def test_write_battery(self, device):
         with pytest.raises(AttributeError):
             device.battery = 50
