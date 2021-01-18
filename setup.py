@@ -6,13 +6,13 @@ from distutils.core import setup
 setup(
     name='libetrv',
     packages=['libetrv', 'libetrv.fields'],
-    version='0.4',
+    version='0.4.1',
     license='Apache License 2.0',
     description='Monitor and control your eTRV from Python',
     author='Adam Strojek',
     author_email='adam@strojek.info',
     url='https://github.com/AdamStrojek/libetrv',
-    download_url='https://github.com/AdamStrojek/libetrv/archive/v0.4.tar.gz',
+    download_url='https://github.com/AdamStrojek/libetrv/archive/v0.4.1.tar.gz',
     keywords=['danfoss', 'etrv', 'libetrv'],
     install_requires=['fire', 'bluepy', 'xxtea', 'loguru', 'cstruct'],
     classifiers=[
