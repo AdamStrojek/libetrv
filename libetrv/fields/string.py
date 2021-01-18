@@ -15,7 +15,7 @@ class TextField(eTRVField):
         self.max_length = max_length
 
     def from_raw_value(self, raw_value, data):
-        return raw_value.decode('ascii').strip('\0')
+        return raw_value.decode('utf8').strip('\0')
     
     def to_raw_value(self, value, data):
-        return str.encode(value[:self.max_length]).ljust(self.max_length, b'\0')
+        return str.encode(value[:self.max_length], encoding='utf8').ljust(self.max_length, b'\0')
