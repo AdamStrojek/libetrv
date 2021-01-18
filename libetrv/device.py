@@ -34,14 +34,41 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
         self.retry_limit=retry_limit
 
     @staticmethod
-    def scan(timeout=10.0):
-        devices = btle.Scanner().scan(timeout)
+    def scan(timeout=10.0, n_expected=1000):
+        seen = set()
+        n = 0
+        for i in range(int(timeout)):
+            devices = btle.Scanner().scan(1)
+            for d in devices:
+                if d.addr in seen:
+                    continue
 
-        for dev in devices:
-            scan_data = dev.getScanData()
-            for (adtype, desc, value) in scan_data:
-                if adtype == 9 and value.endswith(';eTRV'):
-                    yield dev
+                seen.add(d.addr)
+
+                scan_data = d.getScanData()
+
+                for (adtype, desc, value) in scan_data:
+                    if adtype != 9 or not value.endswith(';eTRV'):
+                        continue
+
+                    n += 1
+
+                    # The advertisement data contains
+                    # [Flags][MAC addr][Device type]
+                    # If bit 2 of Flags is set then device is
+                    # in setup mode and we can read the secret key
+                    secret_key = None
+                    flags = int(value[0])
+                    if flags & 0x4:
+                        eTRV = eTRVDevice(d.addr)
+                        secret_key = eTRV.secret_key
+                        eTRV.disconnect()
+
+                    yield d, secret_key
+                    break
+
+            if n == n_expected:
+                break
 
     def is_connected(self):
         return self.ble_device is not None

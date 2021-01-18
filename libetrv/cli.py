@@ -19,8 +19,9 @@ class CLI:
 
     def scan(self, timeout=10.):
         print("Detected eTRV devices:")
-        for device in eTRVDevice.scan(timeout):
-            print("{}, RSSI={}dB".format(device.addr, device.rssi))
+        for device, key in eTRVDevice.scan(timeout):
+            key_str = key if key is not None else "-"
+            print("{}, RSSI={}dB, key={}".format(device.addr, device.rssi, key_str))
     
     def device(self, device_id):
         return Device(device_id, self._pin, self._secret)
