@@ -5,10 +5,23 @@ from distutils.core import setup
 
 setup(
     name='libetrv',
-    version='0.1dev',
+    packages=['libetrv', 'libetrv.fields'],
+    version='0.4',
+    license='Apache License 2.0',
     description='Monitor and control your eTRV from Python',
     author='Adam Strojek',
     author_email='adam@strojek.info',
-    packages=['libetrv', 'libetrv.fields'],
-    install_requires=['fire', 'bluepy', 'xxtea', 'loguru', 'cstruct']
+    url='https://github.com/AdamStrojek/libetrv',
+    download_url='https://github.com/AdamStrojek/libetrv/archive/v0.4.tar.gz',
+    keywords=['danfoss', 'etrv', 'libetrv'],
+    install_requires=['fire', 'bluepy', 'xxtea', 'loguru', 'cstruct'],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Build Tools',
+        'License :: OSI Approved :: Apache License 2.0',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+    ],
 )
