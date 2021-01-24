@@ -38,7 +38,7 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
         seen = set()
         n = 0
         for i in range(int(timeout)):
-            devices = btle.Scanner().scan(1)
+            devices = btle.Scanner().scan(2)
             for d in devices:
                 if d.addr in seen:
                     continue
