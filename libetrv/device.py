@@ -5,7 +5,7 @@ from datetime import datetime
 from .bluetooth import btle
 from loguru import logger
 
-from .data_struct import BatteryData, SettingsData, TemperatureData, CurrentTimeData, SecretKeyData, NameData
+from .data_struct import BatteryData, PinSettingsData, SettingsData, TemperatureData, CurrentTimeData, SecretKeyData, NameData
 from .properties import eTRVProperty
 from .utils import etrv_read, etrv_write
 
@@ -26,7 +26,7 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
         """
         self.address = address
         self.secret = secret
-        self.pin = b'0000' if pin is None else pin
+        self.pin = b'\0\0\0\0' if pin is None else pin.to_bytes(4, byteorder='big')
         self.ble_device = None 
         self.__pin_already_sent = False
 
@@ -117,6 +117,8 @@ class eTRVDevice(metaclass=eTRVDeviceMeta):
             self.__pin_already_sent = True
 
     battery = eTRVProperty(BatteryData)
+    
+    pin_settings = eTRVProperty(PinSettingsData)
 
     settings = eTRVProperty(SettingsData)
 
