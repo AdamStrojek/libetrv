@@ -14,6 +14,16 @@ All supported and tested devices:
 
 - Danfoss Eco Bluetooth LE - WIP
 
+## Changelog
+
+### Version 0.6
+- Migrated CI/CD processes to GitHub Actions workflows.
+- Updated the minimum required Python version to 3.9.
+- Updated setup scripts to use `setuptools`.
+- Added functionality to set the pin number for devices.
+- Updated README with new installation instructions and usage examples.
+- Removed outdated CircleCI badge from the README.
+
 ## Installation
 This software requires at least Python 3.5. All required packages are listed in file `requirements.txt`.
 
