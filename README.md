@@ -1,6 +1,5 @@
 # libetrv
 
-[![CircleCI](https://circleci.com/gh/AdamStrojek/libetrv.svg?style=shield)](https://circleci.com/gh/AdamStrojek/libetrv)
 
 **Library is currently under development and it is not design to be used by end user**
 
