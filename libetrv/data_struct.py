@@ -17,6 +17,18 @@ class BatteryData(eTRVSingleData):
         read_only = True
         direct_field = 'battery'
 
+class PinSettingsData(eTRVData):
+    pin_number = eTRVField()
+    pin_enabled = BitField(name='pin_enabled', bit_position=0)
+
+    class Meta:
+        structure = {
+            0x27: """
+                unsigned int pin_number;
+                unsigned char pin_enabled;
+                unsigned char padding[3];
+            """
+        }
 
 class ScheduleMode(enum.Enum):
     MANUAL = 0
