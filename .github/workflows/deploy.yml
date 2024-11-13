@@ -28,5 +28,8 @@ jobs:
         python setup.py sdist bdist_wheel
 
     - name: Publish package
+      env:
+        TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
       run: |
         twine upload dist/*
