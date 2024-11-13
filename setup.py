@@ -6,7 +6,7 @@ from setuptools import setup
 setup(
     name='libetrv',
     packages=['libetrv', 'libetrv.fields'],
-    version='0.4.1',
+    version='0.6.0',
     license='Apache License 2.0',
     description='Monitor and control your eTRV from Python',
     author='Adam Strojek',
